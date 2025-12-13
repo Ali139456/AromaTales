@@ -150,3 +150,43 @@ export const sendOrderConfirmationEmail = async (order) => {
     return null;
   }
 };
+
+// Send contact form email
+export const sendContactEmail = async (contactData) => {
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_USER || 'info.aromatales@gmail.com',
+      to: 'info.aromatales@gmail.com',
+      replyTo: contactData.email,
+      subject: `Contact Form: ${contactData.subject}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #ffd700;">New Contact Form Submission</h2>
+          
+          <div style="margin: 30px 0; padding: 20px; background: #1a1a1a; border-radius: 8px;">
+            <p style="margin: 10px 0;"><strong>Name:</strong> ${contactData.name}</p>
+            <p style="margin: 10px 0;"><strong>Email:</strong> <a href="mailto:${contactData.email}">${contactData.email}</a></p>
+            ${contactData.phone ? `<p style="margin: 10px 0;"><strong>Phone:</strong> ${contactData.phone}</p>` : ''}
+            <p style="margin: 10px 0;"><strong>Subject:</strong> ${contactData.subject}</p>
+          </div>
+          
+          <h3 style="color: #ffd700; margin-top: 30px;">Message</h3>
+          <div style="margin: 20px 0; padding: 20px; background: #f5f5f5; border-radius: 8px; color: #333;">
+            <p style="white-space: pre-wrap; line-height: 1.6;">${contactData.message}</p>
+          </div>
+          
+          <p style="margin-top: 30px; color: #888; font-size: 0.9em;">
+            This message was sent from the Aroma Tales contact form. Reply directly to this email to respond to ${contactData.name}.
+          </p>
+        </div>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Contact email sent:', info.messageId);
+    return info;
+  } catch (error) {
+    console.error('Error sending contact email:', error);
+    throw error;
+  }
+};

@@ -123,6 +123,27 @@ export const createOrder = async (orderData) => {
   }
 };
 
+// Contact form API
+export const sendContactMessage = async (contactData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(contactData),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to send message' }));
+      throw new Error(errorData.message || 'Failed to send message');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error sending contact message:', error);
+    throw error;
+  }
+};
+
 // Generate a simple session ID for cart
 export const getSessionId = () => {
   let sessionId = localStorage.getItem('aroma_session_id');

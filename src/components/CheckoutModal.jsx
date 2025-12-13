@@ -61,26 +61,36 @@ const CheckoutModal = ({ isOpen, onClose, cart, total, onOrderSuccess }) => {
       return
     }
 
+    if (cart.length === 0) {
+      alert('Your cart is empty. Please add items to your cart before checkout.')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-      const sessionId = localStorage.getItem('aroma_session_id')
+      // Ensure sessionId exists
+      let sessionId = localStorage.getItem('aroma_session_id')
+      if (!sessionId) {
+        sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        localStorage.setItem('aroma_session_id', sessionId)
+      }
       
       const orderData = {
         sessionId,
         customer: {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
+          name: formData.name.trim(),
+          email: formData.email.trim().toLowerCase(),
+          phone: formData.phone.trim(),
           address: {
-            street: formData.street,
-            city: formData.city,
-            postalCode: formData.postalCode,
+            street: formData.street.trim(),
+            city: formData.city.trim(),
+            postalCode: formData.postalCode.trim() || '',
             country: 'Pakistan'
           }
         },
-        paymentMethod: formData.paymentMethod,
-        notes: formData.notes
+        paymentMethod: formData.paymentMethod || 'COD',
+        notes: formData.notes.trim() || ''
       }
 
       const order = await createOrder(orderData)
@@ -105,7 +115,16 @@ const CheckoutModal = ({ isOpen, onClose, cart, total, onOrderSuccess }) => {
       onClose()
     } catch (error) {
       console.error('Error placing order:', error)
-      const errorMessage = error.message || 'Failed to place order. Please try again or contact us at info.aromatales@gmail.com'
+      let errorMessage = 'Failed to place order. '
+      
+      if (error.message.includes('Cart is empty')) {
+        errorMessage += 'Your cart is empty. Please add items to your cart.'
+      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+        errorMessage += 'Network error. Please check your internet connection and try again.'
+      } else {
+        errorMessage += error.message || 'Please try again or contact us at info.aromatales@gmail.com or WhatsApp: +92 333 1290243'
+      }
+      
       alert(errorMessage)
     } finally {
       setIsSubmitting(false)

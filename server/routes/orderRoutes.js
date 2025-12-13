@@ -10,11 +10,20 @@ router.post('/', async (req, res) => {
   try {
     const { sessionId, customer, paymentMethod, notes } = req.body;
 
+    if (!sessionId) {
+      return res.status(400).json({ message: 'Session ID is required' });
+    }
+
     // Get cart items
     const cart = await Cart.findOne({ sessionId }).populate('items.product');
     
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ message: 'Cart is empty' });
+    if (!cart || !cart.items || cart.items.length === 0) {
+      return res.status(400).json({ message: 'Cart is empty. Please add items to your cart before checkout.' });
+    }
+
+    // Validate customer data
+    if (!customer || !customer.name || !customer.email || !customer.phone || !customer.address) {
+      return res.status(400).json({ message: 'Complete customer information is required' });
     }
 
     // Calculate totals

@@ -5,6 +5,7 @@ import connectDB from './config/db.js';
 import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
 import Product from './models/Product.js';
 
 dotenv.config();
@@ -27,6 +28,7 @@ app.use(express.json());
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Seed initial products
 const seedProducts = async () => {
