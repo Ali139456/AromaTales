@@ -56,6 +56,10 @@ const Reviews = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const intervalRef = useRef(null)
+  const touchStartX = useRef(0)
+  const touchEndX = useRef(0)
+  const carouselRef = useRef(null)
+  
   const getReviewsPerView = () => {
     if (window.innerWidth <= 768) return 1
     if (window.innerWidth <= 1200) return 2
@@ -106,6 +110,30 @@ const Reviews = () => {
     setTimeout(() => setIsAutoPlaying(true), 10000)
   }
 
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return
+    
+    const distance = touchStartX.current - touchEndX.current
+    const minSwipeDistance = 50
+
+    if (distance > minSwipeDistance) {
+      goToNext()
+    } else if (distance < -minSwipeDistance) {
+      goToPrevious()
+    }
+
+    touchStartX.current = 0
+    touchEndX.current = 0
+  }
+
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
       <span key={index} className={index < rating ? 'star filled' : 'star'}>
@@ -135,7 +163,13 @@ const Reviews = () => {
             </svg>
           </button>
 
-          <div className="reviews-carousel">
+          <div 
+            className="reviews-carousel"
+            ref={carouselRef}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             <div 
               className="reviews-carousel-track"
               style={{
