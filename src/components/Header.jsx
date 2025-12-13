@@ -44,7 +44,7 @@ const Header = ({ cartCount, cart, removeFromCart, updateQuantity, onCheckout })
             </button>
             
             <button 
-              className="mobile-menu-toggle"
+              className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >

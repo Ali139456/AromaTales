@@ -154,20 +154,52 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .banner {
+    min-height: 90vh;
+  }
+  
+  .banner-content {
+    padding: 2rem 1.5rem;
+    max-width: 800px;
+  }
+  
+  .banner-cta {
+    padding: 1.2rem 2.5rem;
+    font-size: 0.85rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .banner {
+    min-height: 80vh;
+    margin-top: 70px;
+  }
+  
+  .banner-content {
+    padding: 1.5rem 1rem;
+  }
+  
   .banner-title {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 8vw, 2.5rem);
+    margin-bottom: 1rem;
   }
 
   .banner-subtitle {
-    font-size: 1.2rem;
+    font-size: clamp(0.85rem, 3vw, 1rem);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.2em;
   }
 
   .banner-description {
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    margin-bottom: 2rem;
+    line-height: 1.6;
   }
-
-  .banner-content {
-    padding: 1rem;
+  
+  .banner-cta {
+    padding: 1rem 2rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
   }
 }

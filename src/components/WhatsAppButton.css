@@ -34,12 +34,26 @@
   .whatsapp-button {
     width: 56px;
     height: 56px;
-    bottom: 20px;
+    bottom: 80px;
     right: 20px;
   }
 
   .whatsapp-button svg {
     width: 28px;
     height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .whatsapp-button {
+    width: 52px;
+    height: 52px;
+    bottom: 70px;
+    right: 15px;
+  }
+
+  .whatsapp-button svg {
+    width: 26px;
+    height: 26px;
   }
 }
