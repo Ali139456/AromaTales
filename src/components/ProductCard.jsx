@@ -3,6 +3,7 @@ import './ProductCard.css'
 
 const ProductCard = memo(({ product, addToCart }) => {
   const [added, setAdded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   const handleAddToCart = useCallback(() => {
     if (product.inStock && !added) {
@@ -13,6 +14,14 @@ const ProductCard = memo(({ product, addToCart }) => {
       }, 2000)
     }
   }, [product.inStock, product, addToCart, added])
+
+  const toggleExpand = useCallback(() => {
+    setIsExpanded(prev => !prev)
+  }, [])
+
+  // Check if description is long enough to need truncation
+  const description = product.description || ''
+  const shouldShowReadMore = description.length > 150 || description.split('\n').length > 3
 
   return (
     <div className={`product-card ${!product.inStock ? 'out-of-stock' : ''}`}>
@@ -35,7 +44,20 @@ const ProductCard = memo(({ product, addToCart }) => {
       
       <div className="product-info">
         <h3 className="product-name">{product.name}</h3>
-        <p className="product-description">{product.description}</p>
+        <div className="product-description-wrapper">
+          <p className={`product-description ${isExpanded ? 'expanded' : ''}`}>
+            {product.description}
+          </p>
+          {shouldShowReadMore && (
+            <button 
+              className="read-more-btn"
+              onClick={toggleExpand}
+              aria-label={isExpanded ? 'Read less' : 'Read more'}
+            >
+              {isExpanded ? 'Read less' : 'Read more'}
+            </button>
+          )}
+        </div>
         <div className="product-footer">
           <span className="product-price">PKR {product.price.toLocaleString()}</span>
           <button 

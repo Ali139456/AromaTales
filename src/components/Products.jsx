@@ -150,9 +150,11 @@ Base Notes: White Floral, Animalic`,
         </div>
 
         <div className="products-grid">
-          {products.map((product) => (
+          {products.map((product, index) => (
             <div 
               key={product._id || product.id}
+              className="product-card-wrapper"
+              style={{ '--animation-delay': `${index * 0.1}s` }}
             >
               <ProductCard product={product} addToCart={addToCart} />
             </div>
