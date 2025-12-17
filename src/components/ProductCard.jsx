@@ -1,11 +1,13 @@
 import React, { useState, memo, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './ProductCard.css'
 
 const ProductCard = memo(({ product, addToCart }) => {
   const [added, setAdded] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
+  const navigate = useNavigate()
 
-  const handleAddToCart = useCallback(() => {
+  const handleAddToCart = useCallback((e) => {
+    e.stopPropagation()
     if (product.inStock && !added) {
       addToCart(product)
       setAdded(true)
@@ -15,9 +17,11 @@ const ProductCard = memo(({ product, addToCart }) => {
     }
   }, [product.inStock, product, addToCart, added])
 
-  const toggleExpand = useCallback(() => {
-    setIsExpanded(prev => !prev)
-  }, [])
+  const handleReadMore = useCallback((e) => {
+    e.stopPropagation()
+    const productId = product._id || product.id
+    navigate(`/product/${productId}`)
+  }, [product, navigate])
 
   // Check if description is long enough to need truncation
   const description = product.description || ''
@@ -45,16 +49,16 @@ const ProductCard = memo(({ product, addToCart }) => {
       <div className="product-info">
         <h3 className="product-name">{product.name}</h3>
         <div className="product-description-wrapper">
-          <p className={`product-description ${isExpanded ? 'expanded' : ''}`}>
+          <p className="product-description">
             {product.description}
           </p>
           {shouldShowReadMore && (
             <button 
               className="read-more-btn"
-              onClick={toggleExpand}
-              aria-label={isExpanded ? 'Read less' : 'Read more'}
+              onClick={handleReadMore}
+              aria-label="Read more"
             >
-              {isExpanded ? 'Read less' : 'Read more'}
+              Read more
             </button>
           )}
         </div>

@@ -180,15 +180,6 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  max-height: calc(1.6em * 3);
-}
-
-.product-description.expanded {
-  display: block;
-  -webkit-line-clamp: unset;
-  max-height: 1000px;
-  overflow: visible;
 }
 
 .read-more-btn {
@@ -226,6 +217,7 @@
   content: '→';
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-block;
+  margin-left: 0.3rem;
 }
 
 .read-more-btn:hover {

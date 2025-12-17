@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
 import Banner from './components/Banner'
 import Products from './components/Products'
@@ -6,6 +7,7 @@ import Reviews from './components/Reviews'
 import Footer from './components/Footer'
 import CheckoutModal from './components/CheckoutModal'
 import WhatsAppButton from './components/WhatsAppButton'
+import ProductDetail from './components/ProductDetail'
 import { getSessionId, getCart, addToCart as addToCartAPI, updateCartItem, removeFromCart as removeFromCartAPI } from './services/api'
 import './App.css'
 
@@ -135,25 +137,58 @@ function App() {
 
   return (
     <div className="app">
-      <Header 
-        cartCount={getTotalItems} 
-        cart={cart} 
-        removeFromCart={removeFromCart} 
-        updateQuantity={updateQuantity}
-        onCheckout={handleCheckout}
-      />
-      <Banner />
-      <Products addToCart={addToCart} />
-      <Reviews />
-      <Footer />
-      <WhatsAppButton />
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        cart={cart}
-        total={getCartTotal}
-        onOrderSuccess={handleOrderSuccess}
-      />
+      <Routes>
+        <Route
+          path="/product/:id"
+          element={
+            <>
+              <Header 
+                cartCount={getTotalItems} 
+                cart={cart} 
+                removeFromCart={removeFromCart} 
+                updateQuantity={updateQuantity}
+                onCheckout={handleCheckout}
+              />
+              <ProductDetail addToCart={addToCart} />
+              <Footer />
+              <WhatsAppButton />
+              <CheckoutModal
+                isOpen={isCheckoutOpen}
+                onClose={() => setIsCheckoutOpen(false)}
+                cart={cart}
+                total={getCartTotal}
+                onOrderSuccess={handleOrderSuccess}
+              />
+            </>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <>
+              <Header 
+                cartCount={getTotalItems} 
+                cart={cart} 
+                removeFromCart={removeFromCart} 
+                updateQuantity={updateQuantity}
+                onCheckout={handleCheckout}
+              />
+              <Banner />
+              <Products addToCart={addToCart} />
+              <Reviews />
+              <Footer />
+              <WhatsAppButton />
+              <CheckoutModal
+                isOpen={isCheckoutOpen}
+                onClose={() => setIsCheckoutOpen(false)}
+                cart={cart}
+                total={getCartTotal}
+                onOrderSuccess={handleOrderSuccess}
+              />
+            </>
+          }
+        />
+      </Routes>
     </div>
   )
 }
