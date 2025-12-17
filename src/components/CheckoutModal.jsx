@@ -288,7 +288,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total, onOrderSuccess }) => {
           <div className="checkout-summary">
             <div className="summary-row">
               <span>Subtotal:</span>
-              <span>${total.toFixed(2)}</span>
+              <span>PKR {total.toLocaleString()}</span>
             </div>
             <div className="summary-row">
               <span>Shipping:</span>
@@ -296,7 +296,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total, onOrderSuccess }) => {
             </div>
             <div className="summary-row total">
               <span>Total:</span>
-              <span>${total.toFixed(2)}</span>
+              <span>PKR {total.toLocaleString()}</span>
             </div>
           </div>
 

@@ -67,7 +67,7 @@ const CartModal = ({ isOpen, onClose, cart, removeFromCart, updateQuantity, onCh
                       <div className="cart-item-info">
                         <h4 className="cart-item-name">{product.name}</h4>
                         <p className="cart-item-category">{product.category}</p>
-                        <p className="cart-item-price">${product.price.toFixed(2)}</p>
+                        <p className="cart-item-price">PKR {product.price.toLocaleString()}</p>
                       </div>
                       <div className="cart-item-controls">
                         <div className="quantity-controls">
@@ -94,7 +94,7 @@ const CartModal = ({ isOpen, onClose, cart, removeFromCart, updateQuantity, onCh
                         </button>
                       </div>
                       <div className="cart-item-total">
-                        ${((product.price || 0) * (item.quantity || 1)).toFixed(2)}
+                        PKR {((product.price || 0) * (item.quantity || 1)).toLocaleString()}
                       </div>
                     </div>
                   )
@@ -103,7 +103,7 @@ const CartModal = ({ isOpen, onClose, cart, removeFromCart, updateQuantity, onCh
               <div className="cart-total">
                 <div className="cart-total-row">
                   <span>Subtotal:</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>PKR {total.toLocaleString()}</span>
                 </div>
                 <div className="cart-total-row">
                   <span>Shipping:</span>
@@ -111,7 +111,7 @@ const CartModal = ({ isOpen, onClose, cart, removeFromCart, updateQuantity, onCh
                 </div>
                 <div className="cart-total-row total">
                   <span>Total:</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>PKR {total.toLocaleString()}</span>
                 </div>
                 <button className="checkout-button" onClick={onCheckout}>Proceed to Checkout</button>
               </div>
