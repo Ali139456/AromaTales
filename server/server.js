@@ -33,26 +33,26 @@ app.use('/api/contact', contactRoutes);
 // Seed/Update products
 const seedProducts = async () => {
   try {
-    const products = [
-      {
-        name: 'Black Stone',
-        category: 'Men',
-        price: 91.99,
-        description: 'Strong and sophisticated, like polished black stone - mysterious and powerful.',
-        image: '/assets/images/products/black-stoner.jpg',
-        inStock: false
-      },
-      {
-        name: 'Ocean Safari',
-        category: 'Unisex',
-        price: 93.99,
-        description: 'An adventurous journey through oceanic notes that invigorate the senses.',
-        image: '/assets/images/products/ocean-safari.jpg',
-        inStock: false
-      },
-      {
-        name: 'Red Sea',
-        category: 'Unisex',
+      const products = [
+        {
+          name: 'Black Stone',
+          category: 'Men',
+          price: 91.99,
+          description: 'Strong and sophisticated, like polished black stone - mysterious and powerful.',
+          image: '/assets/images/products/black-stoner.jpg',
+          inStock: false
+        },
+        {
+          name: 'Ocean Safari',
+          category: 'Unisex',
+          price: 93.99,
+          description: 'An adventurous journey through oceanic notes that invigorate the senses.',
+          image: '/assets/images/products/ocean-safari.jpg',
+          inStock: false
+        },
+        {
+          name: 'Red Sea',
+          category: 'Unisex',
         price: 3000,
         description: `BRIEF
 Red Sea is a bold and captivating fragrance that exudes charm and sophistication. The top notes of Apple, Lemon, Neroli, and Bergamot create a fresh and fruity opening, offering a vibrant and energizing start. The heart notes of Rose, Teak Wood, and Patchouli add a warm, woody floral complexity, giving the scent depth and richness. The base notes of Vanilla and Musk provide a creamy, smooth, and sensual finish, leaving a lasting impression of elegance and allure. Red Sea is the perfect fragrance for the modern, confident individual.
@@ -75,9 +75,9 @@ Lasting upto: 10–12 hours (measured in standard atmosphere)
 Top Notes: Apple, Lemon, Neroli, Bergamot
 Middle Notes: Rose, Teak Wood, Patchouli
 Base Notes: Vanilla, Musk`,
-        image: '/assets/images/products/Red-Sea.jpg',
-        inStock: true
-      },
+          image: '/assets/images/products/Red-Sea.jpg',
+          inStock: true
+        },
       {
         name: 'Zephyr',
         category: 'Unisex',
@@ -104,16 +104,16 @@ Base Notes: White Floral, Animalic`,
         image: '/assets/images/products/zephyr.jpg',
         inStock: true
       },
-      {
-        name: 'Timeless',
-        category: 'Unisex',
-        price: 97.99,
-        description: 'A fragrance that transcends time, elegant and ever-relevant.',
-        image: '/assets/images/products/timeless.jpg',
-        inStock: false
-      }
-    ];
-    
+        {
+          name: 'Timeless',
+          category: 'Unisex',
+          price: 97.99,
+          description: 'A fragrance that transcends time, elegant and ever-relevant.',
+          image: '/assets/images/products/timeless.jpg',
+          inStock: false
+        }
+      ];
+      
     // Upsert products (update if exists, insert if not) based on name
     for (const product of products) {
       await Product.findOneAndUpdate(

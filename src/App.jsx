@@ -166,25 +166,25 @@ function App() {
           path="/"
           element={
             <>
-              <Header 
-                cartCount={getTotalItems} 
-                cart={cart} 
-                removeFromCart={removeFromCart} 
-                updateQuantity={updateQuantity}
-                onCheckout={handleCheckout}
-              />
-              <Banner />
-              <Products addToCart={addToCart} />
-              <Reviews />
-              <Footer />
-              <WhatsAppButton />
-              <CheckoutModal
-                isOpen={isCheckoutOpen}
-                onClose={() => setIsCheckoutOpen(false)}
-                cart={cart}
-                total={getCartTotal}
-                onOrderSuccess={handleOrderSuccess}
-              />
+      <Header 
+        cartCount={getTotalItems} 
+        cart={cart} 
+        removeFromCart={removeFromCart} 
+        updateQuantity={updateQuantity}
+        onCheckout={handleCheckout}
+      />
+      <Banner />
+      <Products addToCart={addToCart} />
+      <Reviews />
+      <Footer />
+      <WhatsAppButton />
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        cart={cart}
+        total={getCartTotal}
+        onOrderSuccess={handleOrderSuccess}
+      />
             </>
           }
         />
