@@ -76,6 +76,25 @@ const CheckoutModal = ({ isOpen, onClose, cart, total, onOrderSuccess }) => {
         localStorage.setItem('aroma_session_id', sessionId)
       }
       
+      // Import addToCart API function
+      const { addToCart: addToCartAPI } = await import('../services/api')
+      
+      // Sync cart to backend before placing order
+      // This ensures the backend cart exists even if items were added while backend was down
+      try {
+        for (const item of cart) {
+          const productId = item.product?._id || item.product?.id || item._id || item.id
+          if (productId) {
+            const quantity = item.quantity || 1
+            // Try to sync each item (this will create/update the backend cart)
+            await addToCartAPI(sessionId, productId, quantity)
+          }
+        }
+      } catch (syncError) {
+        console.log('Could not sync cart to backend, proceeding with order anyway:', syncError)
+        // Continue with order creation - backend will handle cart not found
+      }
+      
       const orderData = {
         sessionId,
         customer: {

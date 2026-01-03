@@ -15,10 +15,12 @@ router.post('/', async (req, res) => {
     }
 
     // Get cart items
-    const cart = await Cart.findOne({ sessionId }).populate('items.product');
+    let cart = await Cart.findOne({ sessionId }).populate('items.product');
     
+    // If cart doesn't exist on backend but order data has items, we need to handle this
+    // For now, return error asking user to add items via the cart API first
     if (!cart || !cart.items || cart.items.length === 0) {
-      return res.status(400).json({ message: 'Cart is empty. Please add items to your cart before checkout.' });
+      return res.status(400).json({ message: 'Cart is empty or not found. Please add items to your cart before checkout.' });
     }
 
     // Validate customer data
