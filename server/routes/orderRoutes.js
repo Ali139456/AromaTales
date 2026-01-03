@@ -26,9 +26,21 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Complete customer information is required' });
     }
 
+    // Validate that all products exist and have prices
+    for (const item of cart.items) {
+      if (!item.product) {
+        return res.status(400).json({ message: 'One or more products in cart are invalid or no longer available' });
+      }
+      if (!item.product.price || item.product.price <= 0) {
+        return res.status(400).json({ message: 'Invalid product price found in cart' });
+      }
+    }
+
     // Calculate totals
     const subtotal = cart.items.reduce((sum, item) => {
-      return sum + (item.product.price * item.quantity);
+      const itemPrice = item.product?.price || 0;
+      const itemQuantity = item.quantity || 0;
+      return sum + (itemPrice * itemQuantity);
     }, 0);
 
     const shipping = 0; // Free shipping
@@ -71,7 +83,11 @@ router.post('/', async (req, res) => {
     res.status(201).json(order);
   } catch (error) {
     console.error('Error creating order:', error);
-    res.status(400).json({ message: error.message });
+    // Return appropriate error status
+    const statusCode = error.name === 'ValidationError' ? 400 : 500;
+    res.status(statusCode).json({ 
+      message: error.message || 'An error occurred while creating the order. Please try again.' 
+    });
   }
 });
 

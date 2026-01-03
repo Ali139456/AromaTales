@@ -88,11 +88,15 @@ const orderSchema = new mongoose.Schema({
 
 // Generate order number before saving
 orderSchema.pre('save', async function(next) {
-  if (!this.orderNumber) {
-    const count = await mongoose.model('Order').countDocuments();
-    this.orderNumber = `AR-${Date.now()}-${String(count + 1).padStart(4, '0')}`;
+  try {
+    if (!this.orderNumber) {
+      const count = await mongoose.model('Order').countDocuments();
+      this.orderNumber = `AR-${Date.now()}-${String(count + 1).padStart(4, '0')}`;
+    }
+    next();
+  } catch (error) {
+    next(error);
   }
-  next();
 });
 
 const Order = mongoose.model('Order', orderSchema);
