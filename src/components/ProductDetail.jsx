@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { fetchProduct, fetchProducts } from '../services/api'
+import ProductCard from './ProductCard'
 import './ProductDetail.css'
 
 const ProductDetail = ({ addToCart }) => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [product, setProduct] = useState(null)
+  const [allProducts, setAllProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [added, setAdded] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const [rating] = useState(4.5) // Default rating, can be made dynamic later
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -17,12 +20,21 @@ const ProductDetail = ({ addToCart }) => {
         setLoading(true)
         const productData = await fetchProduct(id)
         setProduct(productData)
+        
+        // Load all products for suggested section
+        try {
+          const products = await fetchProducts()
+          setAllProducts(products)
+        } catch (err) {
+          console.log('Could not load all products for suggestions')
+        }
       } catch (error) {
         console.error('Error loading product:', error)
         // Fallback: try to find product from all products
         try {
-          const allProducts = await fetchProducts()
-          const foundProduct = allProducts.find(p => (p._id || p.id) === id)
+          const products = await fetchProducts()
+          setAllProducts(products)
+          const foundProduct = products.find(p => (p._id || p.id) === id)
           if (foundProduct) {
             setProduct(foundProduct)
           } else {
@@ -59,6 +71,28 @@ const ProductDetail = ({ addToCart }) => {
         {index < text.split('\n').length - 1 && <br />}
       </React.Fragment>
     ))
+  }
+
+  // Get suggested products (exclude current product, take 4 random)
+  const suggestedProducts = allProducts
+    .filter(p => (p._id || p.id) !== (product?._id || product?.id))
+    .slice(0, 4)
+
+  const renderStars = (rating) => {
+    const stars = []
+    const fullStars = Math.floor(rating)
+    const hasHalfStar = rating % 1 >= 0.5
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<span key={i} className="star full">★</span>)
+    }
+    if (hasHalfStar) {
+      stars.push(<span key="half" className="star half">★</span>)
+    }
+    for (let i = stars.length; i < 5; i++) {
+      stars.push(<span key={i} className="star empty">★</span>)
+    }
+    return stars
   }
 
   if (loading) {
@@ -111,6 +145,14 @@ const ProductDetail = ({ addToCart }) => {
             <div className="product-detail-category">{product.category}</div>
             <h1 className="product-detail-name">{product.name}</h1>
             
+            <div className="product-detail-rating">
+              <div className="stars-container">
+                {renderStars(rating)}
+              </div>
+              <span className="rating-value">{rating}</span>
+              <span className="rating-count">(127 reviews)</span>
+            </div>
+            
             <div className="product-detail-price">
               PKR {product.price.toLocaleString()}
             </div>
@@ -133,6 +175,19 @@ const ProductDetail = ({ addToCart }) => {
             </div>
           </div>
         </div>
+
+        {suggestedProducts.length > 0 && (
+          <div className="suggested-products-section">
+            <h2 className="suggested-products-title">You May Also Like</h2>
+            <div className="suggested-products-grid">
+              {suggestedProducts.map((suggestedProduct) => (
+                <div key={suggestedProduct._id || suggestedProduct.id} className="suggested-product-wrapper">
+                  <ProductCard product={suggestedProduct} addToCart={addToCart} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
