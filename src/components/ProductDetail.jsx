@@ -34,10 +34,11 @@ const ProductDetail = ({ addToCart }) => {
         try {
           const products = await fetchProducts()
           setAllProducts(products)
-          const foundProduct = products.find(p => (p._id || p.id) === id)
+          const foundProduct = products.find(p => String(p._id || p.id) === String(id))
           if (foundProduct) {
             setProduct(foundProduct)
           } else {
+            console.error('Product not found with ID:', id)
             navigate('/', { replace: true })
           }
         } catch (err) {

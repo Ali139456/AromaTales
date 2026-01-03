@@ -18,9 +18,15 @@ const ProductCard = memo(({ product, addToCart }) => {
   }, [product.inStock, product, addToCart, added])
 
   const handleReadMore = useCallback((e) => {
+    e.preventDefault()
     e.stopPropagation()
     const productId = product._id || product.id
-    navigate(`/product/${productId}`)
+    if (productId) {
+      console.log('Navigating to product:', productId, product.name)
+      navigate(`/product/${productId}`, { replace: false })
+    } else {
+      console.error('Product ID is missing:', product)
+    }
   }, [product, navigate])
 
   // Check if description is long enough to need truncation
