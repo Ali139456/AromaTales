@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { createOrder } from '../services/api'
+import { createOrder, addToCart as addToCartAPI } from '../services/api'
 import './CheckoutModal.css'
 
 const CheckoutModal = ({ isOpen, onClose, cart, total, onOrderSuccess }) => {
@@ -75,9 +75,6 @@ const CheckoutModal = ({ isOpen, onClose, cart, total, onOrderSuccess }) => {
         sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
         localStorage.setItem('aroma_session_id', sessionId)
       }
-      
-      // Import addToCart API function
-      const { addToCart: addToCartAPI } = await import('../services/api')
       
       // Sync cart to backend before placing order
       // This ensures the backend cart exists even if items were added while backend was down
