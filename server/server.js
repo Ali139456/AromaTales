@@ -150,7 +150,7 @@ const PORT = process.env.PORT || 5001;
 
 // Only start server if not in serverless environment (Vercel)
 if (process.env.VERCEL !== '1') {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     // Seed products after a short delay to ensure DB connection
     setTimeout(() => {
@@ -158,6 +158,22 @@ if (process.env.VERCEL !== '1') {
         console.error('Error seeding products:', err.message);
       });
     }, 1000);
+  });
+
+  // Handle server errors gracefully
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      console.error(`\n❌ Port ${PORT} is already in use!\n`);
+      console.log('To fix this, you can:');
+      console.log(`1. Kill the process using port ${PORT}:`);
+      console.log(`   lsof -ti:${PORT} | xargs kill -9\n`);
+      console.log('2. Or use a different port:');
+      console.log(`   PORT=5002 npm run dev\n`);
+      process.exit(1);
+    } else {
+      console.error('Server error:', error);
+      process.exit(1);
+    }
   });
 } else {
   // For Vercel serverless, export the app
