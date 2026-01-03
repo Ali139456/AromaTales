@@ -21,8 +21,8 @@ export const sendOrderEmail = async (order) => {
         <tr>
           <td style="padding: 10px; border-bottom: 1px solid #ddd;">${product?.name || 'Product'}</td>
           <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">$${item.price.toFixed(2)}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">$${(item.price * item.quantity).toFixed(2)}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">PKR ${item.price.toLocaleString()}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">PKR ${(item.price * item.quantity).toLocaleString()}</td>
         </tr>
       `;
     }).join('');
@@ -64,9 +64,9 @@ export const sendOrderEmail = async (order) => {
           
           <div style="margin-top: 20px; padding: 20px; background: #1a1a1a; border-radius: 8px;">
             <p style="margin: 5px 0;"><strong>Payment Method:</strong> ${order.paymentMethod}</p>
-            <p style="margin: 5px 0;"><strong>Subtotal:</strong> $${order.subtotal.toFixed(2)}</p>
+            <p style="margin: 5px 0;"><strong>Subtotal:</strong> PKR ${order.subtotal.toLocaleString()}</p>
             <p style="margin: 5px 0;"><strong>Shipping:</strong> Free</p>
-            <p style="margin: 10px 0; font-size: 1.2em; color: #ffd700;"><strong>Total:</strong> $${order.total.toFixed(2)}</p>
+            <p style="margin: 10px 0; font-size: 1.2em; color: #ffd700;"><strong>Total:</strong> PKR ${order.total.toLocaleString()}</p>
           </div>
           
           ${order.notes ? `<p style="margin-top: 20px;"><strong>Notes:</strong> ${order.notes}</p>` : ''}
@@ -93,7 +93,7 @@ export const sendOrderConfirmationEmail = async (order) => {
         <tr>
           <td style="padding: 10px; border-bottom: 1px solid #ddd;">${product?.name || 'Product'}</td>
           <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">$${(item.price * item.quantity).toFixed(2)}</td>
+          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">PKR ${(item.price * item.quantity).toLocaleString()}</td>
         </tr>
       `;
     }).join('');
@@ -129,9 +129,9 @@ export const sendOrderConfirmationEmail = async (order) => {
           </table>
           
           <div style="margin-top: 20px; padding: 20px; background: #1a1a1a; border-radius: 8px;">
-            <p style="margin: 5px 0;"><strong>Subtotal:</strong> $${order.subtotal.toFixed(2)}</p>
+            <p style="margin: 5px 0;"><strong>Subtotal:</strong> PKR ${order.subtotal.toLocaleString()}</p>
             <p style="margin: 5px 0;"><strong>Shipping:</strong> Free</p>
-            <p style="margin: 10px 0; font-size: 1.2em; color: #ffd700;"><strong>Total:</strong> $${order.total.toFixed(2)}</p>
+            <p style="margin: 10px 0; font-size: 1.2em; color: #ffd700;"><strong>Total:</strong> PKR ${order.total.toLocaleString()}</p>
           </div>
           
           <p style="margin-top: 30px;">We will contact you soon to confirm your order and delivery details.</p>
