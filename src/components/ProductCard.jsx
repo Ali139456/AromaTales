@@ -59,13 +59,16 @@ const ProductCard = memo(({ product, addToCart }) => {
             {product.description}
           </p>
           {shouldShowReadMore && (
-            <button 
+            <Link
+              to={`/product/${product._id || product.id}`}
               className="read-more-btn"
-              onClick={handleReadMore}
-              aria-label="Read more"
+              onClick={(e) => {
+                e.stopPropagation()
+                console.log('Read more clicked, navigating to:', `/product/${product._id || product.id}`)
+              }}
             >
               Read more
-            </button>
+            </Link>
           )}
         </div>
         <div className="product-footer">
