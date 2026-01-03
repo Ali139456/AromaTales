@@ -12,8 +12,11 @@ dotenv.config();
 
 const app = express();
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB (non-blocking - app continues even if DB fails)
+connectDB().catch(err => {
+  console.error('Failed to connect to MongoDB on startup:', err.message);
+  console.log('App will continue with limited functionality');
+});
 
 // Middleware
 const corsOptions = {
@@ -131,7 +134,21 @@ Base Notes: White Floral, Animalic`,
 
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  seedProducts();
-});
+// Only start server if not in serverless environment (Vercel)
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    // Seed products after a short delay to ensure DB connection
+    setTimeout(() => {
+      seedProducts().catch(err => {
+        console.error('Error seeding products:', err.message);
+      });
+    }, 1000);
+  });
+} else {
+  // For Vercel serverless, export the app
+  console.log('Running in serverless mode (Vercel)');
+}
+
+// Export app for Vercel serverless functions
+export default app;

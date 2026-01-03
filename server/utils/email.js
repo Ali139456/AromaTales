@@ -3,17 +3,37 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create transporter (using Gmail)
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER || 'info.aromatales@gmail.com',
-    pass: process.env.EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD
+// Create transporter (using Gmail) - only if credentials are available
+let transporter = null;
+
+try {
+  const emailUser = process.env.EMAIL_USER || 'info.aromatales@gmail.com';
+  const emailPass = process.env.EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD;
+  
+  if (emailPass) {
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: emailUser,
+        pass: emailPass
+      }
+    });
+    console.log('Email transporter configured');
+  } else {
+    console.warn('Email credentials not found - emails will be skipped');
   }
-});
+} catch (error) {
+  console.error('Error configuring email transporter:', error.message);
+  transporter = null;
+}
 
 // Send order notification email
 export const sendOrderEmail = async (order) => {
+  if (!transporter) {
+    console.log('Email transporter not available - skipping admin email');
+    return null;
+  }
+  
   try {
     const orderItemsHtml = order.items.map(item => {
       const product = item.product;
@@ -86,6 +106,11 @@ export const sendOrderEmail = async (order) => {
 
 // Send customer order confirmation email
 export const sendOrderConfirmationEmail = async (order) => {
+  if (!transporter) {
+    console.log('Email transporter not available - skipping customer confirmation email');
+    return null;
+  }
+  
   try {
     const orderItemsHtml = order.items.map(item => {
       const product = item.product;
@@ -153,6 +178,11 @@ export const sendOrderConfirmationEmail = async (order) => {
 
 // Send contact form email
 export const sendContactEmail = async (contactData) => {
+  if (!transporter) {
+    console.log('Email transporter not available - contact form email skipped');
+    throw new Error('Email service is not configured');
+  }
+  
   try {
     const mailOptions = {
       from: process.env.EMAIL_USER || 'info.aromatales@gmail.com',
