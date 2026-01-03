@@ -14,6 +14,11 @@ const ProductDetail = ({ addToCart }) => {
   const [imageError, setImageError] = useState(false)
   const [rating] = useState(4.5) // Default rating, can be made dynamic later
 
+  // Scroll to top when component mounts or id changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [id])
+
   useEffect(() => {
     const loadProduct = async () => {
       // Default products fallback
