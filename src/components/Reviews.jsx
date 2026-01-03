@@ -4,51 +4,99 @@ import './Reviews.css'
 const reviews = [
   {
     id: 1,
-    name: 'Sarah Johnson',
+    name: 'Ahmed Hassan',
     rating: 5,
     date: '2 weeks ago',
-    comment: 'Absolutely love Red Sea! The fragrance is captivating and long-lasting. Perfect for any occasion. Highly recommend!',
+    comment: 'Mashallah, Red Sea is amazing! The smell lasts the whole day. Sab log poochte hain kya perfume hai. Delivery bhi jaldi ho gayi. Definitely recommend!',
     product: 'Red Sea'
   },
   {
     id: 2,
-    name: 'Michael Chen',
+    name: 'Fatima Ali',
     rating: 5,
     date: '1 month ago',
-    comment: 'Black Stone has become my signature scent. It\'s sophisticated and mysterious, exactly as described. Great quality!',
-    product: 'Black Stone'
-  },
-  {
-    id: 3,
-    name: 'Emily Rodriguez',
-    rating: 5,
-    date: '3 weeks ago',
-    comment: 'Timeless is a beautiful fragrance. It\'s elegant and truly lives up to its name. The packaging is also exquisite.',
-    product: 'Timeless'
-  },
-  {
-    id: 4,
-    name: 'David Thompson',
-    rating: 5,
-    date: '1 week ago',
-    comment: 'Ocean Safari is incredible! It brings back memories of beach vacations. Fresh, invigorating, and unique.',
-    product: 'Ocean Safari'
-  },
-  {
-    id: 5,
-    name: 'Jessica Williams',
-    rating: 5,
-    date: '2 months ago',
-    comment: 'I\'ve tried all four fragrances and they are all amazing! Red Sea is my favorite though - so deep and captivating.',
+    comment: 'Red Sea is perfect for weddings and parties. Bahut strong hai aur long lasting bhi. Packaging bhi nice hai. Price bhi reasonable hai for the quality.',
     product: 'Red Sea'
   },
   {
-    id: 6,
-    name: 'Robert Martinez',
+    id: 3,
+    name: 'Hassan Malik',
     rating: 5,
     date: '3 weeks ago',
-    comment: 'Outstanding quality and customer service. Black Stone is powerful yet refined. Will definitely order again!',
-    product: 'Black Stone'
+    comment: 'Zephyr is excellent! Office mein use karta hoon, sab ko pasand aata hai. Value for money hai. Next order bhi yahi se karunga inshaAllah.',
+    product: 'Zephyr'
+  },
+  {
+    id: 4,
+    name: 'Ayesha Khan',
+    rating: 5,
+    date: '1 week ago',
+    comment: 'Red Sea is my favorite now! Evening outings ke liye perfect hai. Smell bahut unique hai, kisi aur ke saath mix nahi hota. Very satisfied!',
+    product: 'Red Sea'
+  },
+  {
+    id: 5,
+    name: 'Muhammad Ali',
+    rating: 5,
+    date: '2 months ago',
+    comment: 'Zephyr is top quality. Daily use kar raha hoon, abhi tak ek bottle hi finish hui. Long lasting hai aur smell bhi classy hai. Highly recommended!',
+    product: 'Zephyr'
+  },
+  {
+    id: 6,
+    name: 'Sana Ahmed',
+    rating: 5,
+    date: '3 weeks ago',
+    comment: 'Red Sea is perfect! Gift kiya tha bhai ko, unhone bahut pasand kiya. Smell luxurious hai aur price bhi theek hai. Will order again for sure.',
+    product: 'Red Sea'
+  },
+  {
+    id: 7,
+    name: 'Usman Sheikh',
+    rating: 5,
+    date: '1 month ago',
+    comment: 'Zephyr is amazing quality. College jaane se pehle lagata hoon, poore din fresh feel hota hai. Packaging bhi nice hai. Great product!',
+    product: 'Zephyr'
+  },
+  {
+    id: 8,
+    name: 'Zainab Malik',
+    rating: 5,
+    date: '2 weeks ago',
+    comment: 'Red Sea is best! Functions aur parties mein use karti hoon. Sab log poochte hain kahan se liya. Smell bahut attractive hai. Love it!',
+    product: 'Red Sea'
+  },
+  {
+    id: 9,
+    name: 'Bilal Ahmed',
+    rating: 5,
+    date: '4 weeks ago',
+    comment: 'Zephyr is excellent value for money. Office mein use karta hoon, colleagues bhi poochte hain. Long lasting hai aur smell professional hai.',
+    product: 'Zephyr'
+  },
+  {
+    id: 10,
+    name: 'Hira Khan',
+    rating: 5,
+    date: '1 week ago',
+    comment: 'Red Sea is perfect for special occasions! Wedding season mein use kiya, bahut compliments mile. Quality top notch hai. Must try!',
+    product: 'Red Sea'
+  },
+  {
+    id: 11,
+    name: 'Hamza Raza',
+    rating: 5,
+    date: '3 weeks ago',
+    comment: 'Zephyr is great! Daily use kar raha hoon, smell fresh hai aur long lasting bhi. Price bhi reasonable hai. Customer service bhi accha hai.',
+    product: 'Zephyr'
+  },
+  {
+    id: 12,
+    name: 'Maryam Ali',
+    rating: 5,
+    date: '2 months ago',
+    comment: 'Red Sea is amazing! Smell unique hai, kisi aur brand jaisa nahi lagta. Long lasting hai aur packaging bhi beautiful hai. Highly satisfied!',
+    product: 'Red Sea'
   }
 ]
 
