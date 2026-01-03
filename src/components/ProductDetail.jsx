@@ -38,10 +38,10 @@ const ProductDetail = ({ addToCart }) => {
           if (foundProduct) {
             setProduct(foundProduct)
           } else {
-            navigate('/#products', { replace: true })
+            navigate('/', { replace: true })
           }
         } catch (err) {
-          navigate('/#products', { replace: true })
+          navigate('/', { replace: true })
         }
       } finally {
         setLoading(false)
@@ -111,7 +111,7 @@ const ProductDetail = ({ addToCart }) => {
       <div className="product-detail-page">
         <div className="product-detail-error">
           <h2>Product not found</h2>
-          <button onClick={() => navigate('/#products')} className="back-button">
+          <button onClick={() => navigate('/')} className="back-button">
             Back to Products
           </button>
         </div>
