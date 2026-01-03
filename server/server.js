@@ -27,11 +27,25 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Routes
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
+
+// Global error handler middleware (must be after routes)
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(err.status || 500).json({ 
+    message: err.message || 'An internal server error occurred. Please try again later.',
+    error: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
 
 // Seed/Update products
 const seedProducts = async () => {
