@@ -430,7 +430,7 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
             {/* First part of description under images */}
             <div className="product-detail-description-left">
               <div className="description-content">
-                {firstPart}
+                {formatDescription(firstPart)}
               </div>
             </div>
           </div>
@@ -455,7 +455,7 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
             <div className="product-detail-description">
               <h2>Description</h2>
               <div className="description-content">
-                {secondPart}
+                {formatDescription(secondPart)}
               </div>
             </div>
 
