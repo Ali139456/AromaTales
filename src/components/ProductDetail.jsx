@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { fetchProduct, fetchProducts } from '../services/api'
 import ProductCard from './ProductCard'
@@ -57,7 +57,11 @@ const ProductDetail = ({ addToCart }) => {
   useEffect(() => {
     if (!lightboxOpen || !product) return
 
-    const productImagesList = getProductImages(product.name, product.image)
+    const productName = product?.name
+    const productImage = product?.image
+    if (!productName || !productImage) return
+
+    const productImagesList = getProductImages(productName, productImage)
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -80,7 +84,7 @@ const ProductDetail = ({ addToCart }) => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'unset'
     }
-  }, [lightboxOpen, selectedImage, product])
+  }, [lightboxOpen, selectedImage, product?.name, product?.image])
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -276,7 +280,8 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
     if (id) {
       loadProduct()
     }
-  }, [id, navigate])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
   const handleAddToCart = () => {
     if (product && product.inStock && !added) {
@@ -344,8 +349,14 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
     )
   }
 
-  const productImages = getProductImages(product.name, product.image)
-  const mainImage = productImages[0] || product.image
+  const productImages = useMemo(() => {
+    if (!product) return []
+    return getProductImages(product.name, product.image)
+  }, [product?.name, product?.image])
+  
+  const mainImage = useMemo(() => {
+    return productImages[0] || product?.image || '/assets/images/products/signature.jpg'
+  }, [productImages, product?.image])
 
   return (
     <div className="product-detail-page">
