@@ -949,51 +949,74 @@
     max-width: 100%;
   }
 
-  .suggested-product-carousel-item .product-image-container {
-    height: 220px;
-  }
-
-  .suggested-product-carousel-item .product-info {
-    padding: 1rem;
-  }
-
-  .suggested-product-carousel-item .product-name {
-    font-size: 1.2rem;
-    margin-bottom: 0.6rem;
-  }
-
-  .suggested-product-carousel-item .product-description {
-    font-size: 0.8rem;
-    margin-bottom: 0.8rem;
-    -webkit-line-clamp: 3;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
+  .suggested-product-carousel-item .product-card {
+    display: flex;
+    flex-direction: row;
+    max-height: 200px;
     overflow: hidden;
   }
 
-  .suggested-product-carousel-item .product-price {
-    font-size: 1.3rem;
+  .suggested-product-carousel-item .product-image-container {
+    width: 45%;
+    height: 200px;
+    flex-shrink: 0;
+    border-radius: 16px 0 0 16px;
   }
 
-  .suggested-product-carousel-item .add-to-cart-btn {
-    padding: 0.7rem 1.2rem;
+  .suggested-product-carousel-item .product-info {
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .suggested-product-carousel-item .product-name {
+    font-size: 1.1rem;
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+  }
+
+  .suggested-product-carousel-item .product-description {
     font-size: 0.7rem;
+    margin-bottom: 0.6rem;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+  }
+
+  .suggested-product-carousel-item .product-price {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .suggested-product-carousel-item .product-footer {
+    padding-top: 0.5rem;
+    margin-top: auto;
+  }
+
+  .suggested-product-carousel-item .add-to-cart-btn,
+  .suggested-product-carousel-item .read-more-btn {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.65rem;
+    margin-top: 0;
   }
 
   .suggested-product-carousel-item .product-category {
-    font-size: 0.55rem;
-    padding: 0.4rem 0.8rem;
+    font-size: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    top: 8px;
+    right: 8px;
   }
 
   .suggested-product-carousel-item .out-of-stock-badge {
-    font-size: 0.55rem;
-    padding: 0.4rem 0.8rem;
-  }
-
-  .suggested-product-carousel-item .read-more-btn {
-    font-size: 0.7rem;
-    padding: 0.5rem 0.8rem;
-    margin-top: 0.6rem;
+    font-size: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    bottom: 8px;
+    left: 8px;
   }
 
   .product-image-thumbnails {
