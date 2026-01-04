@@ -998,11 +998,23 @@
     margin-top: auto;
   }
 
-  .suggested-product-carousel-item .add-to-cart-btn,
-  .suggested-product-carousel-item .read-more-btn {
+  .suggested-product-carousel-item .add-to-cart-btn {
     padding: 0.5rem 0.9rem;
     font-size: 0.65rem;
     margin-top: 0;
+  }
+
+  .suggested-product-carousel-item .read-more-btn {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.6rem;
+    margin-top: 0;
+    border-width: 1px;
+    letter-spacing: 0.05em;
+  }
+
+  .suggested-product-carousel-item .read-more-btn::after {
+    margin-left: 0.2rem;
+    font-size: 0.7em;
   }
 
   .suggested-product-carousel-item .product-category {
