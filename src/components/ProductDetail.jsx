@@ -394,9 +394,7 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
                 ))}
               </div>
             )}
-          </div>
 
-          <div className="product-detail-info-section">
             <div className="product-detail-category">{product.category}</div>
             <h1 className="product-detail-name">{product.name}</h1>
             
@@ -412,13 +410,6 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
               PKR {product.price.toLocaleString()}
             </div>
 
-            <div className="product-detail-description">
-              <h2>Description</h2>
-              <div className="description-content">
-                {formatDescription(product.description)}
-              </div>
-            </div>
-
             <div className="product-detail-actions">
               <button
                 className={`product-detail-add-to-cart ${!product.inStock ? 'disabled' : ''} ${added ? 'added' : ''}`}
@@ -427,6 +418,15 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
               >
                 {added ? '✓ Added to Cart!' : product.inStock ? 'Add to Cart' : 'Out of Stock'}
               </button>
+            </div>
+          </div>
+
+          <div className="product-detail-info-section">
+            <div className="product-detail-description">
+              <h2>Description</h2>
+              <div className="description-content">
+                {formatDescription(product.description)}
+              </div>
             </div>
           </div>
         </div>
