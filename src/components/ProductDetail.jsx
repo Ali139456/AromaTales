@@ -50,19 +50,21 @@ const ProductDetail = ({ addToCart }) => {
 
   // Handle keyboard events for lightbox
   useEffect(() => {
-    if (!lightboxOpen) return
+    if (!lightboxOpen || !product) return
+
+    const productImagesList = getProductImages(product.name, product.image)
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         setLightboxOpen(false)
-      } else if (e.key === 'ArrowLeft' && productImages.length > 1) {
-        const currentIndex = productImages.indexOf(selectedImage)
-        const prevIndex = currentIndex > 0 ? currentIndex - 1 : productImages.length - 1
-        setSelectedImage(productImages[prevIndex])
-      } else if (e.key === 'ArrowRight' && productImages.length > 1) {
-        const currentIndex = productImages.indexOf(selectedImage)
-        const nextIndex = currentIndex < productImages.length - 1 ? currentIndex + 1 : 0
-        setSelectedImage(productImages[nextIndex])
+      } else if (e.key === 'ArrowLeft' && productImagesList.length > 1 && selectedImage) {
+        const currentIndex = productImagesList.indexOf(selectedImage)
+        const prevIndex = currentIndex > 0 ? currentIndex - 1 : productImagesList.length - 1
+        setSelectedImage(productImagesList[prevIndex])
+      } else if (e.key === 'ArrowRight' && productImagesList.length > 1 && selectedImage) {
+        const currentIndex = productImagesList.indexOf(selectedImage)
+        const nextIndex = currentIndex < productImagesList.length - 1 ? currentIndex + 1 : 0
+        setSelectedImage(productImagesList[nextIndex])
       }
     }
 
@@ -73,7 +75,7 @@ const ProductDetail = ({ addToCart }) => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'unset'
     }
-  }, [lightboxOpen, selectedImage, productImages])
+  }, [lightboxOpen, selectedImage, product])
 
   useEffect(() => {
     const loadProduct = async () => {
