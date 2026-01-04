@@ -6,7 +6,7 @@ const router = express.Router();
 // Contact form submission
 router.post('/', async (req, res) => {
   try {
-    const { name, email, phone, subject, message } = req.body;
+    const { name, email, phone, message } = req.body;
 
     // Validate required fields
     if (!name || !email || !message) {
@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
       name: name.trim(),
       email: email.trim().toLowerCase(),
       phone: phone ? phone.trim() : '',
-      subject: subject ? subject.trim() : 'Contact Form Inquiry',
+      subject: 'Contact Form Inquiry',
       message: message.trim()
     });
 

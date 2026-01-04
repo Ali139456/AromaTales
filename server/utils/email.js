@@ -188,7 +188,7 @@ export const sendContactEmail = async (contactData) => {
       from: process.env.EMAIL_USER || 'info.aromatales@gmail.com',
       to: 'info.aromatales@gmail.com',
       replyTo: contactData.email,
-      subject: `Contact Form: ${contactData.subject}`,
+      subject: `Contact Form: ${contactData.subject || 'Inquiry'}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #ffd700;">New Contact Form Submission</h2>
@@ -197,7 +197,6 @@ export const sendContactEmail = async (contactData) => {
             <p style="margin: 10px 0;"><strong>Name:</strong> ${contactData.name}</p>
             <p style="margin: 10px 0;"><strong>Email:</strong> <a href="mailto:${contactData.email}">${contactData.email}</a></p>
             ${contactData.phone ? `<p style="margin: 10px 0;"><strong>Phone:</strong> ${contactData.phone}</p>` : ''}
-            <p style="margin: 10px 0;"><strong>Subject:</strong> ${contactData.subject}</p>
           </div>
           
           <h3 style="color: #ffd700; margin-top: 30px;">Message</h3>
