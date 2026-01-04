@@ -347,38 +347,6 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
   const productImages = getProductImages(product.name, product.image)
   const mainImage = productImages[0] || product.image
 
-  // Split description into two parts for balanced layout
-  const splitDescription = (description) => {
-    if (!description || typeof description !== 'string') {
-      return { firstPart: '', secondPart: '' }
-    }
-    
-    const parts = description.split('\n\n')
-    
-    // Find the index where we can split (look for "Major ingredients" or similar)
-    const splitIndex = parts.findIndex((part, index) => 
-      part.includes('Major ingredients') || 
-      part.includes('Concentration:') ||
-      index >= Math.floor(parts.length / 2)
-    )
-    
-    if (splitIndex > 0 && splitIndex < parts.length) {
-      return {
-        firstPart: parts.slice(0, splitIndex).join('\n\n'),
-        secondPart: parts.slice(splitIndex).join('\n\n')
-      }
-    }
-    
-    // Default split in the middle
-    const midPoint = Math.ceil(parts.length / 2)
-    return {
-      firstPart: parts.slice(0, midPoint).join('\n\n'),
-      secondPart: parts.slice(midPoint).join('\n\n')
-    }
-  }
-
-  const { firstPart, secondPart } = splitDescription(product.description)
-
   return (
     <div className="product-detail-page">
       <div className="product-detail-container">
