@@ -215,20 +215,6 @@
   font-size: 1.1rem;
 }
 
-@media (max-width: 1400px) {
-  .products-grid {
-    display: none;
-  }
-
-  .products-carousel-wrapper {
-    display: block;
-  }
-
-  .product-carousel-item {
-    flex: 0 0 calc(33.333% - 1.67rem);
-  }
-}
-
 @media (max-width: 1024px) {
   .products {
     padding: 5rem 1.5rem;
@@ -236,18 +222,6 @@
 
   .section-header {
     margin-bottom: 4rem;
-  }
-
-  .products-carousel-wrapper {
-    padding: 0 3rem;
-  }
-
-  .product-carousel-item {
-    flex: 0 0 calc((100% - 2rem) / 2);
-  }
-
-  .products-carousel-track {
-    gap: 2rem;
   }
 }
 
