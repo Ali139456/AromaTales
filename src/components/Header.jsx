@@ -71,9 +71,8 @@ const Header = ({ cartCount, cart, removeFromCart, updateQuantity, onCheckout })
               About
             </Link>
             <Link 
-              to="/" 
-              onClick={(e) => handleNavClick('/', e)}
-              data-hash="#contact"
+              to="/contact" 
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               Contact
             </Link>

@@ -8,6 +8,7 @@ import Footer from './components/Footer'
 import CheckoutModal from './components/CheckoutModal'
 import WhatsAppButton from './components/WhatsAppButton'
 import ProductDetail from './components/ProductDetail'
+import Contact from './components/Contact'
 import { getSessionId, getCart, addToCart as addToCartAPI, updateCartItem, removeFromCart as removeFromCartAPI } from './services/api'
 import './App.css'
 
@@ -150,6 +151,30 @@ function App() {
                 onCheckout={handleCheckout}
               />
               <ProductDetail addToCart={addToCart} />
+              <Footer />
+              <WhatsAppButton />
+              <CheckoutModal
+                isOpen={isCheckoutOpen}
+                onClose={() => setIsCheckoutOpen(false)}
+                cart={cart}
+                total={getCartTotal}
+                onOrderSuccess={handleOrderSuccess}
+              />
+            </>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <>
+              <Header 
+                cartCount={getTotalItems} 
+                cart={cart} 
+                removeFromCart={removeFromCart} 
+                updateQuantity={updateQuantity}
+                onCheckout={handleCheckout}
+              />
+              <Contact />
               <Footer />
               <WhatsAppButton />
               <CheckoutModal
