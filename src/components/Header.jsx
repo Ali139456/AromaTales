@@ -1,16 +1,36 @@
 import React, { useState, memo } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import CartModal from './CartModal'
 import './Header.css'
 
 const Header = ({ cartCount, cart, removeFromCart, updateQuantity, onCheckout }) => {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const handleNavClick = (path, e) => {
+    setIsMobileMenuOpen(false)
+    if (location.pathname === path) {
+      e.preventDefault()
+      // If already on the page, scroll to section
+      if (path === '/') {
+        const hash = e.target.getAttribute('data-hash')
+        if (hash) {
+          const element = document.querySelector(hash)
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' })
+          }
+        }
+      }
+    }
+  }
 
   return (
     <>
       <header className="header">
         <div className="header-container">
-          <div className="logo">
+          <Link to="/" className="logo" onClick={() => setIsMobileMenuOpen(false)}>
             <img 
               src="/assets/images/logo/Aroma Tales Logo.png" 
               alt="Logo" 
@@ -19,14 +39,44 @@ const Header = ({ cartCount, cart, removeFromCart, updateQuantity, onCheckout })
                 e.target.src = "/assets/images/logo/aromalogo_Black.png"
               }}
             />
-          </div>
+          </Link>
           
           <nav className={`nav ${isMobileMenuOpen ? 'nav-open' : ''}`}>
-            <a href="#home" onClick={() => setIsMobileMenuOpen(false)}>Home</a>
-            <a href="#products" onClick={() => setIsMobileMenuOpen(false)}>Products</a>
-            <a href="#reviews" onClick={() => setIsMobileMenuOpen(false)}>Reviews</a>
-            <a href="#about" onClick={() => setIsMobileMenuOpen(false)}>About</a>
-            <a href="#contact" onClick={() => setIsMobileMenuOpen(false)}>Contact</a>
+            <Link 
+              to="/" 
+              onClick={(e) => handleNavClick('/', e)}
+              data-hash="#home"
+            >
+              Home
+            </Link>
+            <Link 
+              to="/" 
+              onClick={(e) => handleNavClick('/', e)}
+              data-hash="#products"
+            >
+              Products
+            </Link>
+            <Link 
+              to="/" 
+              onClick={(e) => handleNavClick('/', e)}
+              data-hash="#reviews"
+            >
+              Reviews
+            </Link>
+            <Link 
+              to="/" 
+              onClick={(e) => handleNavClick('/', e)}
+              data-hash="#about"
+            >
+              About
+            </Link>
+            <Link 
+              to="/" 
+              onClick={(e) => handleNavClick('/', e)}
+              data-hash="#contact"
+            >
+              Contact
+            </Link>
           </nav>
 
           <div className="header-actions">
