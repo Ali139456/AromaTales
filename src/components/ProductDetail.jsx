@@ -441,39 +441,42 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
       </div>
 
       {/* Lightbox Modal */}
-      {lightboxOpen && selectedImage && (
+      {lightboxOpen && selectedImage && product && (
         <div className="image-lightbox" onClick={() => setLightboxOpen(false)}>
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
             <button className="lightbox-close" onClick={() => setLightboxOpen(false)}>
               ×
             </button>
             <img src={selectedImage} alt={product.name} className="lightbox-image" />
-            {productImages.length > 1 && (
-              <div className="lightbox-navigation">
-                <button
-                  className="lightbox-nav-btn prev"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    const currentIndex = productImages.indexOf(selectedImage)
-                    const prevIndex = currentIndex > 0 ? currentIndex - 1 : productImages.length - 1
-                    setSelectedImage(productImages[prevIndex])
-                  }}
-                >
-                  ‹
-                </button>
-                <button
-                  className="lightbox-nav-btn next"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    const currentIndex = productImages.indexOf(selectedImage)
-                    const nextIndex = currentIndex < productImages.length - 1 ? currentIndex + 1 : 0
-                    setSelectedImage(productImages[nextIndex])
-                  }}
-                >
-                  ›
-                </button>
-              </div>
-            )}
+            {(() => {
+              const lightboxImages = getProductImages(product.name, product.image)
+              return lightboxImages.length > 1 && (
+                <div className="lightbox-navigation">
+                  <button
+                    className="lightbox-nav-btn prev"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const currentIndex = lightboxImages.indexOf(selectedImage)
+                      const prevIndex = currentIndex > 0 ? currentIndex - 1 : lightboxImages.length - 1
+                      setSelectedImage(lightboxImages[prevIndex])
+                    }}
+                  >
+                    ‹
+                  </button>
+                  <button
+                    className="lightbox-nav-btn next"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      const currentIndex = lightboxImages.indexOf(selectedImage)
+                      const nextIndex = currentIndex < lightboxImages.length - 1 ? currentIndex + 1 : 0
+                      setSelectedImage(lightboxImages[nextIndex])
+                    }}
+                  >
+                    ›
+                  </button>
+                </div>
+              )
+            })()}
           </div>
         </div>
       )}
