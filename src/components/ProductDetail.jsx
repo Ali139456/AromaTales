@@ -15,6 +15,7 @@ const ProductDetail = ({ addToCart }) => {
   const [rating] = useState(4.5) // Default rating, can be made dynamic later
   const [selectedImage, setSelectedImage] = useState(null)
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [carouselIndex, setCarouselIndex] = useState(0)
 
   // Get all images for a product
   // Colorful/styled images from images-2 are main, white background from images-1 are thumbnails
