@@ -347,6 +347,35 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
   const productImages = getProductImages(product.name, product.image)
   const mainImage = productImages[0] || product.image
 
+  // Split description into two parts for balanced layout
+  const splitDescription = (description) => {
+    const formatted = formatDescription(description)
+    const parts = formatted.split('\n\n')
+    
+    // Find the index where we can split (look for "Major ingredients" or similar)
+    const splitIndex = parts.findIndex((part, index) => 
+      part.includes('Major ingredients') || 
+      part.includes('Concentration:') ||
+      index >= Math.floor(parts.length / 2)
+    )
+    
+    if (splitIndex > 0 && splitIndex < parts.length) {
+      return {
+        firstPart: parts.slice(0, splitIndex).join('\n\n'),
+        secondPart: parts.slice(splitIndex).join('\n\n')
+      }
+    }
+    
+    // Default split in the middle
+    const midPoint = Math.ceil(parts.length / 2)
+    return {
+      firstPart: parts.slice(0, midPoint).join('\n\n'),
+      secondPart: parts.slice(midPoint).join('\n\n')
+    }
+  }
+
+  const { firstPart, secondPart } = splitDescription(product.description)
+
   return (
     <div className="product-detail-page">
       <div className="product-detail-container">
@@ -394,6 +423,13 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
                 ))}
               </div>
             )}
+
+            {/* First part of description under images */}
+            <div className="product-detail-description-left">
+              <div className="description-content">
+                {firstPart}
+              </div>
+            </div>
           </div>
 
           <div className="product-detail-info-section">
@@ -412,10 +448,11 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
               PKR {product.price.toLocaleString()}
             </div>
 
+            {/* Second part of description on right side */}
             <div className="product-detail-description">
               <h2>Description</h2>
               <div className="description-content">
-                {formatDescription(product.description)}
+                {secondPart}
               </div>
             </div>
 

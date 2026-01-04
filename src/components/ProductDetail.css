@@ -474,6 +474,17 @@
   position: relative;
 }
 
+.product-detail-description-left {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid rgba(255, 215, 0, 0.2);
+  position: relative;
+}
+
+.product-detail-description-left .description-content {
+  padding: 1.5rem;
+}
+
 .product-detail-description::before {
   content: '';
   position: absolute;
