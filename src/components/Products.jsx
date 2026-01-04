@@ -17,7 +17,25 @@ const Products = ({ addToCart }) => {
           name: 'Black Stone',
           category: 'Men',
           price: 91.99,
-          description: 'Strong and sophisticated, like polished black stone - mysterious and powerful.',
+          description: `BRIEF
+Black Stone is a rich and luxurious fragrance that exudes sophistication and depth. The top notes of Woody and Agarwood provide an earthy and powerful opening, setting the tone for an unforgettable experience. The heart notes of Vanilla and Sweet create a warm and inviting core, adding a soft and creamy sweetness to the composition. The base notes of Sandalwood, Oud, and Powdery create a refined and opulent finish, with the deep richness of oud perfectly balanced by the smoothness of sandalwood. Black Stone is ideal for those who appreciate deep, exotic, and timeless scents.
+
+Major ingredients % wise:
+Woody Accord: 12%
+Agarwood (Oud) Accord: 10%
+Vanilla Extract: 8%
+Sweet Accord: 7%
+Sandalwood Oil: 9%
+Oud Accord: 7%
+Powdery Accord: 7%
+
+Concentration: 40% (Extrait De Parfum)
+Sillage: Strong
+Lasting upto: 12–14 hours (measured in standard atmosphere)
+
+Top Notes: Woody, Agarwood
+Middle Notes: Vanilla, Sweet
+Base Notes: Sandalwood, Oud, Powdery`,
           image: '/assets/images/products/black-stoner.jpg',
           inStock: false
         },

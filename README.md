@@ -105,3 +105,4 @@ See [server/README.md](./server/README.md) for backend environment variables.
 - All error scenarios are handled gracefully
 - The site will never crash due to backend unavailability
 
+
