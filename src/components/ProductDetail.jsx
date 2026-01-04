@@ -434,12 +434,59 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
         {suggestedProducts.length > 0 && (
           <div className="suggested-products-section">
             <h2 className="suggested-products-title">You May Also Like</h2>
-            <div className="suggested-products-grid">
-              {suggestedProducts.map((suggestedProduct) => (
-                <div key={suggestedProduct._id || suggestedProduct.id} className="suggested-product-wrapper">
-                  <ProductCard product={suggestedProduct} addToCart={addToCart} />
+            <div className="suggested-products-wrapper">
+              <div className="suggested-products-grid">
+                {suggestedProducts.map((suggestedProduct) => (
+                  <div key={suggestedProduct._id || suggestedProduct.id} className="suggested-product-wrapper">
+                    <ProductCard product={suggestedProduct} addToCart={addToCart} />
+                  </div>
+                ))}
+              </div>
+              {/* Mobile Carousel */}
+              <div className="suggested-products-carousel">
+                <div 
+                  className="suggested-products-carousel-track"
+                  style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
+                >
+                  {suggestedProducts.map((suggestedProduct) => (
+                    <div key={suggestedProduct._id || suggestedProduct.id} className="suggested-product-carousel-item">
+                      <ProductCard product={suggestedProduct} addToCart={addToCart} />
+                    </div>
+                  ))}
                 </div>
-              ))}
+                {suggestedProducts.length > 1 && (
+                  <>
+                    <button
+                      className="suggested-carousel-arrow suggested-carousel-arrow-left"
+                      onClick={() => setCarouselIndex((prev) => (prev > 0 ? prev - 1 : suggestedProducts.length - 1))}
+                      aria-label="Previous product"
+                    >
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                      </svg>
+                    </button>
+                    <button
+                      className="suggested-carousel-arrow suggested-carousel-arrow-right"
+                      onClick={() => setCarouselIndex((prev) => (prev < suggestedProducts.length - 1 ? prev + 1 : 0))}
+                      aria-label="Next product"
+                    >
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                      </svg>
+                    </button>
+                    <div className="suggested-carousel-indicators">
+                      {suggestedProducts.map((_, index) => (
+                        <button
+                          key={index}
+                          className={`suggested-carousel-indicator ${index === carouselIndex ? 'active' : ''}`}
+                          onClick={() => setCarouselIndex(index)}
+                          aria-label={`Go to product ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}
