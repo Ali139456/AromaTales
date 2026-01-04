@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react'
+import React, { useState, useEffect, memo, useRef } from 'react'
 import ProductCard from './ProductCard'
 import { fetchProducts } from '../services/api'
 import './Products.css'
@@ -7,6 +7,9 @@ const Products = ({ addToCart }) => {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [carouselIndex, setCarouselIndex] = useState(0)
+  const [itemsPerView, setItemsPerView] = useState(3)
+  const carouselRef = useRef(null)
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -195,6 +198,20 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
     )
   }
 
+  const goToPrevious = () => {
+    setCarouselIndex((prev) => {
+      const maxIndex = Math.max(0, products.length - itemsPerView)
+      return prev <= 0 ? maxIndex : prev - 1
+    })
+  }
+
+  const goToNext = () => {
+    setCarouselIndex((prev) => {
+      const maxIndex = Math.max(0, products.length - itemsPerView)
+      return prev >= maxIndex ? 0 : prev + 1
+    })
+  }
+
   return (
     <section id="products" className="products">
       <div className="products-container">
@@ -205,6 +222,7 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
           </p>
         </div>
 
+        {/* Desktop Grid */}
         <div className="products-grid">
           {products.map((product, index) => (
             <div 
@@ -215,6 +233,50 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
               <ProductCard product={product} addToCart={addToCart} />
             </div>
           ))}
+        </div>
+
+        {/* Laptop/Tablet Carousel */}
+        <div className="products-carousel-wrapper">
+          <button 
+            className="products-carousel-arrow products-carousel-arrow-left" 
+            onClick={goToPrevious}
+            aria-label="Previous products"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <div 
+            className="products-carousel"
+            ref={carouselRef}
+          >
+            <div 
+              className="products-carousel-track"
+              style={{
+                transform: `translateX(-${carouselIndex * (100 / itemsPerView)}%)`
+              }}
+            >
+              {products.map((product, index) => (
+                <div 
+                  key={product._id || product.id}
+                  className="product-carousel-item"
+                >
+                  <ProductCard product={product} addToCart={addToCart} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button 
+            className="products-carousel-arrow products-carousel-arrow-right" 
+            onClick={goToNext}
+            aria-label="Next products"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
         </div>
       </div>
 

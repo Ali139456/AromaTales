@@ -155,9 +155,15 @@
 }
 
 
+@media (max-width: 1400px) {
+  .banner {
+    min-height: 85vh;
+  }
+}
+
 @media (max-width: 1024px) {
   .banner {
-    min-height: 90vh;
+    min-height: 70vh;
   }
   
   .banner-content {
@@ -168,16 +174,6 @@
   .banner-cta {
     padding: 1.2rem 2.5rem;
     font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 1024px) {
-  .banner {
-    min-height: 85vh;
-  }
-
-  .banner-content {
-    padding: 2rem 1.5rem;
   }
 }
 
