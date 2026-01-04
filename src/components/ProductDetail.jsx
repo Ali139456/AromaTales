@@ -394,13 +394,6 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
                 ))}
               </div>
             )}
-
-            {/* First part of description under images */}
-            <div className="product-detail-description-left">
-              <div className="description-content">
-                {formatDescription(firstPart)}
-              </div>
-            </div>
           </div>
 
           <div className="product-detail-info-section">
@@ -419,11 +412,10 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
               PKR {product.price.toLocaleString()}
             </div>
 
-            {/* Second part of description on right side */}
             <div className="product-detail-description">
               <h2>Description</h2>
               <div className="description-content">
-                {formatDescription(secondPart)}
+                {formatDescription(product.description)}
               </div>
             </div>
 
