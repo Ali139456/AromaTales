@@ -7,7 +7,6 @@ const Contact = () => {
     name: '',
     email: '',
     phone: '',
-    subject: '',
     message: ''
   })
   const [loading, setLoading] = useState(false)
@@ -33,7 +32,6 @@ const Contact = () => {
         name: '',
         email: '',
         phone: '',
-        subject: '',
         message: ''
       })
     } catch (error) {
