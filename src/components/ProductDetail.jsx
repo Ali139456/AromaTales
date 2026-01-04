@@ -25,17 +25,20 @@ const ProductDetail = ({ addToCart }) => {
         '/assets/images/products/black-stoner.jpg'  // Thumbnail: white background
       ],
       'Ocean Safari': [
-        '/assets/images/products/ocean-safari.jpg'  // Only one image available
+        '/assets/images/products/ocean-safari.jpg',      // Main: colorful/styled
+        '/assets/images/products/ocean-safari-white.jpg' // Thumbnail: white background
       ],
       'Red Sea': [
         '/assets/images/products/red-sea.png',      // Main: colorful/styled
         '/assets/images/products/Red-Sea.jpg'       // Thumbnail: white background
       ],
       'Timeless': [
-        '/assets/images/products/timeless.jpg'      // Only one image available
+        '/assets/images/products/timeless.jpg',      // Main: colorful/styled
+        '/assets/images/products/timeless-white.jpg' // Thumbnail: white background
       ],
       'Zephyr': [
-        '/assets/images/products/zephyr.jpg'        // Only one image available
+        '/assets/images/products/zephyr.jpg',        // Main: colorful/styled
+        '/assets/images/products/zephyr-white.jpg'   // Thumbnail: white background
       ]
     }
     
