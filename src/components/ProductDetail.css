@@ -646,12 +646,6 @@
   z-index: 0;
 }
 
-.product-detail-add-to-cart {
-  position: relative;
-  z-index: 1;
-  transition: color 0.3s;
-}
-
 .product-detail-add-to-cart:hover:not(.disabled) {
   transform: translateY(-3px) scale(1.02);
   box-shadow: 
