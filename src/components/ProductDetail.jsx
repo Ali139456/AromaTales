@@ -164,7 +164,7 @@ Lasting upto: 10–12 hours (measured in standard atmosphere)
 Top Notes: Apple, Lemon, Neroli, Bergamot
 Middle Notes: Rose, Teak Wood, Patchouli
 Base Notes: Vanilla, Musk`,
-          image: '/assets/images/products/Red-Sea.jpg',
+          image: '/assets/images/products/red-sea.png',
           inStock: true
         },
         {
