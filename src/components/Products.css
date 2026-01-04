@@ -109,7 +109,7 @@
 }
 
 .product-carousel-item {
-  flex: 0 0 calc(33.333% - 1.67rem);
+  flex: 0 0 calc((100% - 5rem) / 3);
   min-width: 0;
   width: 100%;
 }
@@ -310,7 +310,7 @@
   }
 
   .product-carousel-item {
-    flex: 0 0 calc(50% - 1.25rem);
+    flex: 0 0 calc((100% - 2rem) / 2);
   }
 
   .products-carousel-track {
@@ -355,6 +355,7 @@
 
   .product-carousel-item {
     flex: 0 0 100%;
+    padding: 0 0.5rem;
   }
 
   .products-carousel-track {
