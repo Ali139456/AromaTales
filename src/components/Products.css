@@ -215,9 +215,20 @@
   font-size: 1.1rem;
 }
 
+@media (max-width: 1024px) {
+  .products {
+    padding: 5rem 1.5rem;
+  }
+
+  .section-header {
+    margin-bottom: 4rem;
+  }
+}
+
 @media (max-width: 768px) {
   .products {
     padding: 4rem 1rem;
+    margin-top: 0;
   }
   
   .section-header {
@@ -245,7 +256,21 @@
     gap: 2rem;
     padding: 1rem 0;
   }
-  
+}
+
+@media (max-width: 480px) {
+  .products {
+    padding: 3rem 0.75rem;
+  }
+
+  .section-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-title {
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+  }
+}
   .about-section {
     padding: 4rem 1rem;
     margin-top: 4rem;
