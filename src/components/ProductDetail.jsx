@@ -283,7 +283,7 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  const handleAddToCart = () => {
+  const handleAddToCart = useCallback(() => {
     if (product && product.inStock && !added) {
       addToCart(product)
       setAdded(true)
@@ -291,22 +291,18 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
         setAdded(false)
       }, 2000)
     }
-  }
+  }, [product, added, addToCart])
 
-  const formatDescription = (text) => {
-    if (!text) return ''
-    return text.split('\n').map((line, index) => (
+  const formatDescription = useCallback((text) => {
+    if (!text || typeof text !== 'string') return ''
+    const lines = text.split('\n')
+    return lines.map((line, index) => (
       <React.Fragment key={index}>
         {line}
-        {index < text.split('\n').length - 1 && <br />}
+        {index < lines.length - 1 && <br />}
       </React.Fragment>
     ))
-  }
-
-  // Get suggested products (exclude current product, take 4 random)
-  const suggestedProducts = allProducts
-    .filter(p => (p._id || p.id) !== (product?._id || product?.id))
-    .slice(0, 4)
+  }, [])
 
   const renderStars = (rating) => {
     const stars = []
@@ -324,6 +320,24 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
     }
     return stars
   }
+
+  // Get suggested products (exclude current product, take 4 random)
+  const suggestedProducts = useMemo(() => {
+    if (!product || !allProducts.length) return []
+    const productId = product._id || product.id
+    return allProducts
+      .filter(p => (p._id || p.id) !== productId)
+      .slice(0, 4)
+  }, [allProducts, product])
+
+  const productImages = useMemo(() => {
+    if (!product) return []
+    return getProductImages(product.name, product.image)
+  }, [product?.name, product?.image])
+  
+  const mainImage = useMemo(() => {
+    return productImages[0] || product?.image || '/assets/images/products/signature.jpg'
+  }, [productImages, product?.image])
 
   if (loading) {
     return (
@@ -348,15 +362,6 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
       </div>
     )
   }
-
-  const productImages = useMemo(() => {
-    if (!product) return []
-    return getProductImages(product.name, product.image)
-  }, [product?.name, product?.image])
-  
-  const mainImage = useMemo(() => {
-    return productImages[0] || product?.image || '/assets/images/products/signature.jpg'
-  }, [productImages, product?.image])
 
   return (
     <div className="product-detail-page">
