@@ -349,8 +349,11 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
 
   // Split description into two parts for balanced layout
   const splitDescription = (description) => {
-    const formatted = formatDescription(description)
-    const parts = formatted.split('\n\n')
+    if (!description || typeof description !== 'string') {
+      return { firstPart: '', secondPart: '' }
+    }
+    
+    const parts = description.split('\n\n')
     
     // Find the index where we can split (look for "Major ingredients" or similar)
     const splitIndex = parts.findIndex((part, index) => 
