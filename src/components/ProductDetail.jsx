@@ -17,24 +17,25 @@ const ProductDetail = ({ addToCart }) => {
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
   // Get all images for a product
+  // Colorful/styled images from images-2 are main, white background from images-1 are thumbnails
   const getProductImages = (productName, defaultImage) => {
     const imageMap = {
       'Black Stone': [
-        '/assets/images/products/black-stoner.jpg',
-        '/assets/images/products/black-stone.jpg'
+        '/assets/images/products/black-stone.jpg',  // Main: colorful/styled
+        '/assets/images/products/black-stoner.jpg'  // Thumbnail: white background
       ],
       'Ocean Safari': [
-        '/assets/images/products/ocean-safari.jpg'
+        '/assets/images/products/ocean-safari.jpg'  // Only one image available
       ],
       'Red Sea': [
-        '/assets/images/products/Red-Sea.jpg',
-        '/assets/images/products/red-sea.png'
+        '/assets/images/products/red-sea.png',      // Main: colorful/styled
+        '/assets/images/products/Red-Sea.jpg'       // Thumbnail: white background
       ],
       'Timeless': [
-        '/assets/images/products/timeless.jpg'
+        '/assets/images/products/timeless.jpg'      // Only one image available
       ],
       'Zephyr': [
-        '/assets/images/products/zephyr.jpg'
+        '/assets/images/products/zephyr.jpg'        // Only one image available
       ]
     }
     
