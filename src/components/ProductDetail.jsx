@@ -109,7 +109,7 @@ Lasting upto: 12–14 hours (measured in standard atmosphere)
 Top Notes: Woody, Agarwood
 Middle Notes: Vanilla, Sweet
 Base Notes: Sandalwood, Oud, Powdery`,
-          image: '/assets/images/products/black-stoner.jpg',
+          image: '/assets/images/products/black-stone.jpg',
           inStock: false
         },
         {
