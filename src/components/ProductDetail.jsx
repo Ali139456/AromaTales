@@ -13,11 +13,67 @@ const ProductDetail = ({ addToCart }) => {
   const [added, setAdded] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [rating] = useState(4.5) // Default rating, can be made dynamic later
+  const [selectedImage, setSelectedImage] = useState(null)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+
+  // Get all images for a product
+  const getProductImages = (productName, defaultImage) => {
+    const imageMap = {
+      'Black Stone': [
+        '/assets/images/products/black-stoner.jpg',
+        '/assets/images/products/black-stone.jpg'
+      ],
+      'Ocean Safari': [
+        '/assets/images/products/ocean-safari.jpg'
+      ],
+      'Red Sea': [
+        '/assets/images/products/Red-Sea.jpg',
+        '/assets/images/products/red-sea.png'
+      ],
+      'Timeless': [
+        '/assets/images/products/timeless.jpg'
+      ],
+      'Zephyr': [
+        '/assets/images/products/zephyr.jpg'
+      ]
+    }
+    
+    const images = imageMap[productName] || []
+    // If no images found, use the product's default image
+    return images.length > 0 ? images : [defaultImage || '/assets/images/products/Signature.jpg']
+  }
 
   // Scroll to top when component mounts or id changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [id])
+
+  // Handle keyboard events for lightbox
+  useEffect(() => {
+    if (!lightboxOpen) return
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setLightboxOpen(false)
+      } else if (e.key === 'ArrowLeft' && productImages.length > 1) {
+        const currentIndex = productImages.indexOf(selectedImage)
+        const prevIndex = currentIndex > 0 ? currentIndex - 1 : productImages.length - 1
+        setSelectedImage(productImages[prevIndex])
+      } else if (e.key === 'ArrowRight' && productImages.length > 1) {
+        const currentIndex = productImages.indexOf(selectedImage)
+        const nextIndex = currentIndex < productImages.length - 1 ? currentIndex + 1 : 0
+        setSelectedImage(productImages[nextIndex])
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = 'unset'
+    }
+  }, [lightboxOpen, selectedImage, productImages])
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -281,6 +337,9 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
     )
   }
 
+  const productImages = getProductImages(product.name, product.image)
+  const mainImage = productImages[0] || product.image
+
   return (
     <div className="product-detail-page">
       <div className="product-detail-container">
@@ -290,9 +349,12 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
 
         <div className="product-detail-content">
           <div className="product-detail-image-section">
-            <div className="product-image-wrapper">
+            <div className="product-image-wrapper" onClick={() => {
+              setSelectedImage(mainImage)
+              setLightboxOpen(true)
+            }}>
               <img
-                src={imageError ? '/assets/images/products/Signature.jpg' : product.image}
+                src={imageError ? '/assets/images/products/Signature.jpg' : mainImage}
                 alt={product.name}
                 className="product-detail-image"
                 onError={() => setImageError(true)}
@@ -300,7 +362,31 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
               {!product.inStock && (
                 <div className="out-of-stock-overlay">Out of Stock</div>
               )}
+              <div className="image-zoom-hint">Click to enlarge</div>
             </div>
+            
+            {productImages.length > 1 && (
+              <div className="product-image-thumbnails">
+                {productImages.map((image, index) => (
+                  <div
+                    key={index}
+                    className={`thumbnail-item ${mainImage === image ? 'active' : ''}`}
+                    onClick={() => {
+                      setSelectedImage(image)
+                      setLightboxOpen(true)
+                    }}
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.name} ${index + 1}`}
+                      onError={(e) => {
+                        e.target.src = '/assets/images/products/Signature.jpg'
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="product-detail-info-section">
@@ -351,6 +437,44 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
           </div>
         )}
       </div>
+
+      {/* Lightbox Modal */}
+      {lightboxOpen && selectedImage && (
+        <div className="image-lightbox" onClick={() => setLightboxOpen(false)}>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <button className="lightbox-close" onClick={() => setLightboxOpen(false)}>
+              ×
+            </button>
+            <img src={selectedImage} alt={product.name} className="lightbox-image" />
+            {productImages.length > 1 && (
+              <div className="lightbox-navigation">
+                <button
+                  className="lightbox-nav-btn prev"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const currentIndex = productImages.indexOf(selectedImage)
+                    const prevIndex = currentIndex > 0 ? currentIndex - 1 : productImages.length - 1
+                    setSelectedImage(productImages[prevIndex])
+                  }}
+                >
+                  ‹
+                </button>
+                <button
+                  className="lightbox-nav-btn next"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const currentIndex = productImages.indexOf(selectedImage)
+                    const nextIndex = currentIndex < productImages.length - 1 ? currentIndex + 1 : 0
+                    setSelectedImage(productImages[nextIndex])
+                  }}
+                >
+                  ›
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
