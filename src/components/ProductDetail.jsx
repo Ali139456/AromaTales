@@ -30,7 +30,7 @@ const ProductDetail = ({ addToCart }) => {
       ],
       'Red Sea': [
         '/assets/images/products/red-sea.png',      // Main: colorful/styled
-        '/assets/images/products/Red-Sea.jpg'       // Thumbnail: white background
+        '/assets/images/products/red-sea-white.jpg' // Thumbnail: white background
       ],
       'Timeless': [
         '/assets/images/products/timeless.jpg',      // Main: colorful/styled
@@ -44,7 +44,7 @@ const ProductDetail = ({ addToCart }) => {
     
     const images = imageMap[productName] || []
     // If no images found, use the product's default image
-    return images.length > 0 ? images : [defaultImage || '/assets/images/products/Signature.jpg']
+    return images.length > 0 ? images : [defaultImage || '/assets/images/products/signature.jpg']
   }
 
   // Scroll to top when component mounts or id changes
@@ -360,7 +360,7 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
               setLightboxOpen(true)
             }}>
               <img
-                src={imageError ? '/assets/images/products/Signature.jpg' : mainImage}
+                src={imageError ? '/assets/images/products/signature.jpg' : mainImage}
                 alt={product.name}
                 className="product-detail-image"
                 onError={() => setImageError(true)}
@@ -386,7 +386,7 @@ Base Notes: Woody, Earthy, Mossy, Alcohol`,
                       src={image}
                       alt={`${product.name} ${index + 1}`}
                       onError={(e) => {
-                        e.target.src = '/assets/images/products/Signature.jpg'
+                        e.target.src = '/assets/images/products/signature.jpg'
                       }}
                     />
                   </div>

@@ -43,7 +43,7 @@ const ProductCard = memo(({ product, addToCart }) => {
           loading="lazy"
           decoding="async"
           onError={(e) => {
-            e.target.src = '/assets/images/products/Signature.jpg'
+            e.target.src = '/assets/images/products/signature.jpg'
           }}
         />
         <div className="product-category">{product.category}</div>

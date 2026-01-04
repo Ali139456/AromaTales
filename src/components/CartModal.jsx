@@ -61,7 +61,7 @@ const CartModal = ({ isOpen, onClose, cart, removeFromCart, updateQuantity, onCh
                         loading="lazy"
                         decoding="async"
                         onError={(e) => {
-                          e.target.src = '/assets/images/products/Signature.jpg'
+                          e.target.src = '/assets/images/products/signature.jpg'
                         }}
                       />
                       <div className="cart-item-info">
