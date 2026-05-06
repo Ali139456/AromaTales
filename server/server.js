@@ -14,8 +14,46 @@ dotenv.config();
 
 const app = express();
 
+const expandOrigins = (list) => {
+  const out = new Set(list.filter(Boolean));
+  for (const o of [...out]) {
+    try {
+      const u = new URL(o);
+      const host = u.hostname;
+      if (host.startsWith('www.')) {
+        out.add(`${u.protocol}//${host.slice(4)}`);
+      } else if (host !== 'localhost' && !host.startsWith('127.')) {
+        out.add(`${u.protocol}//www.${host}`);
+      }
+    } catch {
+      /* ignore bad URL */
+    }
+  }
+  return [...out];
+};
+
+const buildCorsOrigin = () => {
+  const raw = process.env.FRONTEND_URL;
+  if (!raw || raw === '*') {
+    return true;
+  }
+  const list = raw.split(',').map((s) => s.trim()).filter(Boolean);
+  const origins = expandOrigins(list);
+  return (origin, callback) => {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+    if (origins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(null, false);
+  };
+};
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || '*',
+  origin: buildCorsOrigin(),
   credentials: true,
   optionsSuccessStatus: 200
 };
