@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { apiPath } from '../services/api'
 import './AuthPages.css'
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
 export default function SignIn() {
   const { signIn } = useAuth()
@@ -31,8 +30,8 @@ export default function SignIn() {
         setError('Check your email and confirm your account before signing in.')
         return
       }
-      const r = await fetch(`${API_BASE_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
+      const r = await fetch(apiPath('/auth/me'), {
+        headers: { Authorization: 'Bearer ' + token }
       })
       const body = await r.json().catch(() => ({}))
       const role = body.profile?.role

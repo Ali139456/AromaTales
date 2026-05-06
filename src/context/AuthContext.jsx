@@ -1,13 +1,12 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+import { apiPath } from '../services/api'
 
 const AuthContext = createContext(null)
 
 async function fetchProfile(accessToken) {
-  const response = await fetch(`${API_BASE_URL}/auth/me`, {
-    headers: { Authorization: `Bearer ${accessToken}` }
+  const response = await fetch(apiPath('/auth/me'), {
+    headers: { Authorization: 'Bearer ' + accessToken }
   })
   if (!response.ok) return null
   const data = await response.json()

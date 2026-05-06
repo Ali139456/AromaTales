@@ -1,99 +1,112 @@
 // API Base URL - uses environment variable in production, /api in development
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
+/** Build request URL with string concat so bundles never rely on minified template literals. */
+export function apiPath(path) {
+  const base = API_BASE_URL.replace(/\/$/, '')
+  const segment = path.startsWith('/') ? path : '/' + path
+  return base + segment
+}
+
 export const fetchProducts = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/products`);
+    const response = await fetch(apiPath('/products'))
     if (!response.ok) {
-      throw new Error('Failed to fetch products');
+      throw new Error('Failed to fetch products')
     }
-    return await response.json();
+    return await response.json()
   } catch (error) {
-    console.error('Error fetching products:', error);
-    throw error;
+    console.error('Error fetching products:', error)
+    throw error
   }
-};
+}
 
 export const fetchProduct = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/products/${id}`);
+    const response = await fetch(apiPath('/products/' + encodeURIComponent(id)))
     if (!response.ok) {
-      throw new Error('Failed to fetch product');
+      throw new Error('Failed to fetch product')
     }
-    return await response.json();
+    return await response.json()
   } catch (error) {
-    console.error('Error fetching product:', error);
-    throw error;
+    console.error('Error fetching product:', error)
+    throw error
   }
-};
+}
 
 export const getCart = async (sessionId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/cart/${sessionId}`);
+    const response = await fetch(apiPath('/cart/' + encodeURIComponent(sessionId)))
     if (!response.ok) {
-      throw new Error('Failed to fetch cart');
+      throw new Error('Failed to fetch cart')
     }
-    return await response.json();
+    return await response.json()
   } catch (error) {
-    console.error('Error fetching cart:', error);
-    throw error;
+    console.error('Error fetching cart:', error)
+    throw error
   }
-};
+}
 
 export const addToCart = async (sessionId, productId, quantity = 1) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/items`, {
+    const response = await fetch(apiPath('/cart/' + encodeURIComponent(sessionId) + '/items'), {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ productId, quantity }),
-    });
+      body: JSON.stringify({ productId, quantity })
+    })
     if (!response.ok) {
-      throw new Error('Failed to add item to cart');
+      throw new Error('Failed to add item to cart')
     }
-    return await response.json();
+    return await response.json()
   } catch (error) {
-    console.error('Error adding to cart:', error);
-    throw error;
+    console.error('Error adding to cart:', error)
+    throw error
   }
-};
+}
 
 export const updateCartItem = async (sessionId, itemId, quantity) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/items/${encodeURIComponent(itemId)}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ quantity }),
-    });
+    const response = await fetch(
+      apiPath('/cart/' + encodeURIComponent(sessionId) + '/items/' + encodeURIComponent(itemId)),
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ quantity })
+      }
+    )
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to update cart item' }));
-      throw new Error(errorData.message || 'Failed to update cart item');
+      const errorData = await response.json().catch(() => ({ message: 'Failed to update cart item' }))
+      throw new Error(errorData.message || 'Failed to update cart item')
     }
-    return await response.json();
+    return await response.json()
   } catch (error) {
-    console.error('Error updating cart item:', error);
-    throw error;
+    console.error('Error updating cart item:', error)
+    throw error
   }
-};
+}
 
 export const removeFromCart = async (sessionId, itemId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/items/${encodeURIComponent(itemId)}`, {
-      method: 'DELETE',
-    });
+    const response = await fetch(
+      apiPath('/cart/' + encodeURIComponent(sessionId) + '/items/' + encodeURIComponent(itemId)),
+      {
+        method: 'DELETE'
+      }
+    )
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to remove item from cart' }));
-      throw new Error(errorData.message || 'Failed to remove item from cart');
+      const errorData = await response.json().catch(() => ({ message: 'Failed to remove item from cart' }))
+      throw new Error(errorData.message || 'Failed to remove item from cart')
     }
-    return await response.json();
+    return await response.json()
   } catch (error) {
-    console.error('Error removing from cart:', error);
-    throw error;
+    console.error('Error removing from cart:', error)
+    throw error
   }
-};
+}
 
 // Order API
 export const createOrder = async (orderData, accessToken) => {
@@ -102,9 +115,9 @@ export const createOrder = async (orderData, accessToken) => {
       'Content-Type': 'application/json'
     }
     if (accessToken) {
-      headers.Authorization = `Bearer ${accessToken}`
+      headers.Authorization = 'Bearer ' + accessToken
     }
-    const response = await fetch(`${API_BASE_URL}/orders`, {
+    const response = await fetch(apiPath('/orders'), {
       method: 'POST',
       headers,
       body: JSON.stringify(orderData)
@@ -121,8 +134,8 @@ export const createOrder = async (orderData, accessToken) => {
 }
 
 export const fetchMyOrders = async (accessToken) => {
-  const response = await fetch(`${API_BASE_URL}/orders/me`, {
-    headers: { Authorization: `Bearer ${accessToken}` }
+  const response = await fetch(apiPath('/orders/me'), {
+    headers: { Authorization: 'Bearer ' + accessToken }
   })
   if (!response.ok) {
     const err = await response.json().catch(() => ({}))
@@ -132,12 +145,12 @@ export const fetchMyOrders = async (accessToken) => {
 }
 
 const adminAuth = (token) => ({
-  Authorization: `Bearer ${token}`,
+  Authorization: 'Bearer ' + token,
   'Content-Type': 'application/json'
 })
 
 export const fetchAdminProducts = async (accessToken) => {
-  const response = await fetch(`${API_BASE_URL}/admin/products`, {
+  const response = await fetch(apiPath('/admin/products'), {
     headers: adminAuth(accessToken)
   })
   if (!response.ok) {
@@ -148,7 +161,7 @@ export const fetchAdminProducts = async (accessToken) => {
 }
 
 export const createAdminProduct = async (accessToken, payload) => {
-  const response = await fetch(`${API_BASE_URL}/admin/products`, {
+  const response = await fetch(apiPath('/admin/products'), {
     method: 'POST',
     headers: adminAuth(accessToken),
     body: JSON.stringify(payload)
@@ -161,7 +174,7 @@ export const createAdminProduct = async (accessToken, payload) => {
 }
 
 export const updateAdminProduct = async (accessToken, id, payload) => {
-  const response = await fetch(`${API_BASE_URL}/admin/products/${encodeURIComponent(id)}`, {
+  const response = await fetch(apiPath('/admin/products/' + encodeURIComponent(id)), {
     method: 'PUT',
     headers: adminAuth(accessToken),
     body: JSON.stringify(payload)
@@ -174,9 +187,9 @@ export const updateAdminProduct = async (accessToken, id, payload) => {
 }
 
 export const deleteAdminProduct = async (accessToken, id) => {
-  const response = await fetch(`${API_BASE_URL}/admin/products/${encodeURIComponent(id)}`, {
+  const response = await fetch(apiPath('/admin/products/' + encodeURIComponent(id)), {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${accessToken}` }
+    headers: { Authorization: 'Bearer ' + accessToken }
   })
   if (!response.ok) {
     const err = await response.json().catch(() => ({}))
@@ -188,9 +201,9 @@ export const deleteAdminProduct = async (accessToken, id) => {
 export const uploadAdminProductImage = async (accessToken, file) => {
   const body = new FormData()
   body.append('image', file)
-  const response = await fetch(`${API_BASE_URL}/admin/upload-image`, {
+  const response = await fetch(apiPath('/admin/upload-image'), {
     method: 'POST',
-    headers: { Authorization: `Bearer ${accessToken}` },
+    headers: { Authorization: 'Bearer ' + accessToken },
     body
   })
   if (!response.ok) {
@@ -203,30 +216,30 @@ export const uploadAdminProductImage = async (accessToken, file) => {
 // Contact form API
 export const sendContactMessage = async (contactData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/contact`, {
+    const response = await fetch(apiPath('/contact'), {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(contactData),
-    });
+      body: JSON.stringify(contactData)
+    })
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to send message' }));
-      throw new Error(errorData.message || 'Failed to send message');
+      const errorData = await response.json().catch(() => ({ message: 'Failed to send message' }))
+      throw new Error(errorData.message || 'Failed to send message')
     }
-    return await response.json();
+    return await response.json()
   } catch (error) {
-    console.error('Error sending contact message:', error);
-    throw error;
+    console.error('Error sending contact message:', error)
+    throw error
   }
-};
+}
 
 // Generate a simple session ID for cart
 export const getSessionId = () => {
-  let sessionId = localStorage.getItem('aroma_session_id');
+  let sessionId = localStorage.getItem('aroma_session_id')
   if (!sessionId) {
-    sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem('aroma_session_id', sessionId);
+    sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    localStorage.setItem('aroma_session_id', sessionId)
   }
-  return sessionId;
-};
+  return sessionId
+}
