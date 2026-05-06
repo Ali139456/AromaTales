@@ -60,13 +60,15 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-app.get('/api/health', (req, res) => {
+const healthHandler = (req, res) => {
   res.json({
     status: 'ok',
     supabase: isSupabaseEnabled(),
     timestamp: new Date().toISOString()
   });
-});
+};
+
+app.get('/api/health', healthHandler);
 
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
@@ -74,6 +76,17 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+
+/* Vercel rewrites /api/* → /api; the function often sees paths without the /api prefix (e.g. /products). */
+if (process.env.VERCEL) {
+  app.get('/health', healthHandler);
+  app.use('/products', productRoutes);
+  app.use('/cart', cartRoutes);
+  app.use('/orders', orderRoutes);
+  app.use('/contact', contactRoutes);
+  app.use('/auth', authRoutes);
+  app.use('/admin', adminRoutes);
+}
 
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
