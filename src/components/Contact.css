@@ -1,7 +1,7 @@
 .contact-page {
   min-height: 100vh;
   padding: 8rem 2rem 4rem;
-  background: var(--black);
+  background: var(--surface-0);
   position: relative;
   overflow: hidden;
 }
@@ -13,9 +13,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 70%, rgba(255, 184, 0, 0.03) 0%, transparent 50%);
+  background:
+    radial-gradient(circle at 20% 30%, rgba(154, 123, 79, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(154, 123, 79, 0.05) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
 }
@@ -33,26 +33,11 @@
 }
 
 .contact-title {
-  font-size: clamp(3rem, 6vw, 5rem);
-  font-weight: 900;
-  color: var(--text-white);
-  margin-bottom: 1.5rem;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 1rem;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, #ffffff 0%, #ffd700 50%, #ffffff 100%);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer-title 3s ease infinite;
-}
-
-@keyframes shimmer-title {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
 }
 
 .contact-subtitle {
@@ -85,24 +70,18 @@
 }
 
 .contact-info-card {
-  background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(15, 15, 15, 0.98) 100%);
-  backdrop-filter: blur(20px);
+  background: var(--surface-0);
   border-radius: 24px;
   padding: 3rem;
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(255, 215, 0, 0.1);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
 }
 
 .contact-info-card h3 {
   font-size: 2rem;
-  color: var(--text-white);
+  color: var(--text);
   margin-bottom: 2.5rem;
-  background: linear-gradient(135deg, #ffd700 0%, #ffb800 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-weight: 600;
 }
 
 .contact-info-item {
@@ -111,7 +90,7 @@
   gap: 1.5rem;
   margin-bottom: 2.5rem;
   padding-bottom: 2.5rem;
-  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+  border-bottom: 1px solid var(--border);
 }
 
 .contact-info-item:last-of-type {
@@ -124,13 +103,13 @@
   width: 50px;
   height: 50px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 184, 0, 0.05));
+  background: var(--surface-2);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--primary-gold);
   flex-shrink: 0;
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  border: 1px solid var(--border);
 }
 
 .contact-info-item h4 {
@@ -144,7 +123,7 @@
 }
 
 .contact-info-item a {
-  color: var(--text-white);
+  color: var(--text);
   font-size: 1.1rem;
   transition: all 0.3s ease;
   display: inline-block;
@@ -180,32 +159,29 @@
   width: 45px;
   height: 45px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 184, 0, 0.05));
+  background: var(--surface-2);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-white);
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  color: var(--text);
+  border: 1px solid var(--border);
   transition: all 0.3s ease;
 }
 
 .contact-social .social-link:hover {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 184, 0, 0.15));
-  border-color: var(--primary-gold);
-  color: var(--primary-gold);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+  box-shadow: var(--shadow-soft);
 }
 
 .contact-form-section {
-  background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(15, 15, 15, 0.98) 100%);
-  backdrop-filter: blur(20px);
+  background: var(--surface-0);
   border-radius: 24px;
   padding: 3rem;
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(255, 215, 0, 0.1);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
 }
 
 .contact-form {
@@ -234,15 +210,15 @@
 }
 
 .contact-message.success {
-  background: rgba(34, 197, 94, 0.2);
-  border: 1px solid rgba(34, 197, 94, 0.5);
-  color: #86efac;
+  background: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  color: #047857;
 }
 
 .contact-message.error {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.5);
-  color: #fca5a5;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
 }
 
 .form-group {
@@ -254,31 +230,31 @@
 .form-group label {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--text-white);
+  color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans), sans-serif;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
   padding: 1rem 1.5rem;
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid rgba(255, 215, 0, 0.2);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  color: var(--text-white);
+  color: var(--text);
   font-size: 1rem;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans), sans-serif;
   transition: all 0.3s ease;
   outline: none;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: var(--primary-gold);
-  background: rgba(0, 0, 0, 0.6);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+  border-color: var(--accent);
+  background: var(--surface-0);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .form-group input::placeholder,
@@ -295,15 +271,15 @@
 
 .contact-submit-btn {
   padding: 1.4rem 3rem;
-  background: var(--gradient-gold);
-  color: var(--black);
-  font-weight: 800;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
   font-size: 1rem;
   border-radius: 50px;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  border: 2px solid rgba(255, 215, 0, 0.3);
-  box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.2);
+  border: 1px solid var(--accent);
+  box-shadow: var(--shadow-soft);
   position: relative;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);

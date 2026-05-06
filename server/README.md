@@ -1,79 +1,90 @@
-# Backend Server Setup
+# Aroma Tales · Backend (Express + Supabase + Resend)
 
-## How to Run the Backend
+## Quick Start
 
-### 1. Install Dependencies (if not already installed)
+### 1. Install dependencies
 ```bash
 cd server
 npm install
 ```
 
-### 2. Set Up Environment Variables (Optional)
-Create a `.env` file in the `server` directory with the following variables:
+### 2. Configure environment
+Copy `.env.example` to `.env` and fill in the values:
+```bash
+cp .env.example .env
+```
 
 ```env
-# MongoDB Connection (optional - defaults to localhost)
-MONGODB_URI=mongodb://localhost:27017/aroma-tales
-
-# Server Port (optional - defaults to 5001)
+# Server
 PORT=5001
+FRONTEND_URL=http://localhost:5173   # production: https://aromatales.shop
 
-# Email Configuration (optional - for order emails)
-EMAIL_USER=info.aromatales@gmail.com
-EMAIL_PASSWORD=your_gmail_app_password
+# Supabase
+SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=YOUR-SERVICE-ROLE-KEY
 
-# Frontend URL (optional - for CORS)
-FRONTEND_URL=http://localhost:5173
+# Resend
+RESEND_API_KEY=re_xxx_your_api_key
+RESEND_FROM_EMAIL=Aroma Tales <onboarding@resend.dev>
+ADMIN_EMAIL=info.aromatales@gmail.com
 ```
 
-**Note:** The server will work with default values if you don't create a `.env` file, but you'll need MongoDB running locally.
+> The server will still boot without these variables, but data and email features will be disabled until they're set.
 
-### 3. Make Sure MongoDB is Running
-If using local MongoDB:
+### 3. Initialise the Supabase schema
+Open the Supabase SQL editor and paste the contents of [`server/sql/schema.sql`](./sql/schema.sql), then run it. This creates the `products`, `cart_items`, `orders` and `order_items` tables (plus updated_at triggers and a public read policy on the catalogue).
+
+### 4. Run the server
 ```bash
-# On macOS with Homebrew:
-brew services start mongodb-community
-
-# Or start MongoDB manually
-mongod
-```
-
-If using MongoDB Atlas (cloud), set `MONGODB_URI` in your `.env` file.
-
-### 4. Run the Server
-
-**Development mode (with auto-reload):**
-```bash
-npm run dev
-```
-
-**Production mode:**
-```bash
+npm run dev      # auto-reload via nodemon
+# or
 npm start
 ```
 
-The server will start on `http://localhost:5001` (or the PORT you specified).
-
-### 5. Verify It's Running
-You should see:
+When everything's wired up you'll see:
 ```
-MongoDB Connected: localhost
+Supabase client initialised
+Resend email client initialised
 Server running on port 5001
 Products seeded/updated successfully
 ```
 
+The first run will upsert the five demo products into Supabase using the canonical list at `server/data/defaultProducts.js`.
+
+## Where to get the keys
+
+| Variable | Where |
+| --- | --- |
+| `SUPABASE_URL` | Supabase dashboard → Project Settings → API → "Project URL" |
+| `SUPABASE_SERVICE_ROLE_KEY` | Same page → "service_role" key (server-only, never expose to the browser) |
+| `RESEND_API_KEY` | https://resend.com/api-keys |
+| `RESEND_FROM_EMAIL` | A verified domain on Resend, e.g. `Aroma Tales <hello@aromatales.com>`. Until a domain is verified, you can use `onboarding@resend.dev` |
+| `ADMIN_EMAIL` | Where order/contact form notifications should land |
+
 ## API Endpoints
 
-- `GET /api/products` - Get all products
-- `GET /api/products/:id` - Get product by ID
-- `POST /api/cart` - Add item to cart
-- `GET /api/cart/:sessionId` - Get cart
-- `POST /api/orders` - Create order (sends emails)
-- `POST /api/contact` - Send contact form
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/api/health` | Health check (also reports Supabase connection) |
+| GET | `/api/products` | List products |
+| GET | `/api/products/:id` | Product detail |
+| POST | `/api/products` | Create product |
+| PUT | `/api/products/:id` | Update product |
+| DELETE | `/api/products/:id` | Delete product |
+| GET | `/api/cart/:sessionId` | Get cart |
+| POST | `/api/cart/:sessionId/items` | Add item |
+| PUT | `/api/cart/:sessionId/items/:itemId` | Update quantity |
+| DELETE | `/api/cart/:sessionId/items/:itemId` | Remove item |
+| DELETE | `/api/cart/:sessionId` | Empty cart |
+| POST | `/api/orders` | Place order (sends 2 Resend emails) |
+| GET | `/api/orders` | List all orders (admin) |
+| GET | `/api/orders/:id` | Order detail |
+| GET | `/api/orders/session/:sessionId` | Orders for a session |
+| PUT | `/api/orders/:id/status` | Update order status |
+| POST | `/api/contact` | Send a contact form message |
 
 ## Troubleshooting
 
-- **MongoDB connection error**: Make sure MongoDB is running or check your `MONGODB_URI`
-- **Port already in use**: Change the `PORT` in `.env` or kill the process using port 5001
-- **Email errors**: Email functionality is optional - orders will still be saved even if emails fail
-
+- **"Database not configured" 503**: `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` missing or wrong. Restart server after fixing `.env`.
+- **No emails arriving**: Resend rejects sends from unverified domains. Use `onboarding@resend.dev` while you're setting up DNS, then switch to your own domain.
+- **Port already in use**: change `PORT` in `.env`, or kill the existing process (`netstat -ano | findstr :5001` on Windows).

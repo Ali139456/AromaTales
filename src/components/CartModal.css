@@ -23,16 +23,16 @@
 }
 
 .cart-modal {
-  background: var(--primary-dark-lighter);
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  border-radius: 32px;
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: 24px;
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 25px 80px rgba(15, 23, 42, 0.15);
 }
 
 @keyframes slideUp {
@@ -48,7 +48,7 @@
 
 .cart-modal-header {
   padding: 1.5rem;
-  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -56,14 +56,14 @@
 
 .cart-modal-header h2 {
   font-size: 1.75rem;
-  color: var(--text-white);
-  font-weight: 800;
+  color: var(--text);
+  font-weight: 700;
 }
 
 .close-button {
   background: none;
   border: none;
-  color: var(--text-dark);
+  color: var(--text-muted);
   padding: 0.5rem;
   cursor: pointer;
   transition: color 0.3s ease;
@@ -111,10 +111,10 @@
   grid-template-columns: 80px 1fr auto auto;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border);
   border-radius: 12px;
   align-items: center;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--surface-1);
 }
 
 .cart-item-image {
@@ -132,7 +132,7 @@
 
 .cart-item-name {
   font-size: 1rem;
-  color: var(--text-white);
+  color: var(--text);
   margin: 0;
   font-weight: 600;
 }
@@ -162,10 +162,10 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.25rem;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--surface-0);
 }
 
 .quantity-btn {
@@ -177,7 +177,7 @@
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
-  color: var(--text-white);
+  color: var(--text);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 4px;
@@ -192,7 +192,7 @@
   min-width: 30px;
   text-align: center;
   font-weight: 600;
-  color: var(--text-white);
+  color: var(--text);
 }
 
 .remove-button {
@@ -217,7 +217,7 @@
 }
 
 .cart-total {
-  border-top: 2px solid var(--shadow);
+  border-top: 1px solid var(--border);
   padding-top: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -236,13 +236,13 @@
   font-weight: 800;
   color: var(--primary-gold);
   padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 215, 0, 0.2);
+  border-top: 1px solid var(--border);
 }
 
 .checkout-button {
-  background: var(--gradient-gold);
-  color: var(--black);
-  border: 2px solid rgba(255, 215, 0, 0.3);
+  background: var(--accent);
+  color: #fff;
+  border: 1px solid var(--accent);
   padding: 1.2rem 2rem;
   border-radius: 50px;
   font-weight: 700;

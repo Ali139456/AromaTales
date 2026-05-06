@@ -1,98 +1,156 @@
 import express from 'express';
-import Cart from '../models/Cart.js';
-import Product from '../models/Product.js';
+import supabase, { isSupabaseEnabled } from '../config/supabase.js';
+import {
+  addMemoryCartItem,
+  clearMemoryCart,
+  getMemoryCart,
+  removeMemoryCartItem,
+  updateMemoryCartItem
+} from '../memoryCart.js';
 
 const router = express.Router();
 
-// Get or create cart
+const formatProduct = (product) => {
+  if (!product) return product;
+  return {
+    _id: product.id,
+    id: product.id,
+    name: product.name,
+    category: product.category,
+    price: Number(product.price),
+    description: product.description,
+    image: product.image,
+    inStock: product.in_stock
+  };
+};
+
+const buildCartResponse = async (sessionId) => {
+  const { data: items, error } = await supabase
+    .from('cart_items')
+    .select('id, quantity, created_at, product:products(*)')
+    .eq('session_id', sessionId)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  const formatted = (items || []).map((item) => ({
+    _id: item.id,
+    id: item.id,
+    quantity: item.quantity,
+    product: formatProduct(item.product)
+  }));
+  return { sessionId, items: formatted };
+};
+
 router.get('/:sessionId', async (req, res) => {
+  if (!isSupabaseEnabled()) {
+    return res.json(getMemoryCart(req.params.sessionId));
+  }
   try {
-    let cart = await Cart.findOne({ sessionId: req.params.sessionId })
-      .populate('items.product');
-    
-    if (!cart) {
-      cart = new Cart({ sessionId: req.params.sessionId, items: [] });
-      await cart.save();
-    }
-    
+    const cart = await buildCartResponse(req.params.sessionId);
     res.json(cart);
   } catch (error) {
+    console.error('Error fetching cart:', error);
     res.status(500).json({ message: error.message });
   }
 });
 
-// Add item to cart
 router.post('/:sessionId/items', async (req, res) => {
+  if (!isSupabaseEnabled()) {
+    try {
+      const { productId, quantity = 1 } = req.body;
+      if (!productId) return res.status(400).json({ message: 'productId is required' });
+      const cart = addMemoryCartItem(req.params.sessionId, productId, quantity);
+      return res.json(cart);
+    } catch (error) {
+      const status = error.status || 400;
+      return res.status(status).json({ message: error.message });
+    }
+  }
   try {
     const { productId, quantity = 1 } = req.body;
-    
-    // Check if product exists and is in stock
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+    const { sessionId } = req.params;
+
+    if (!productId) {
+      return res.status(400).json({ message: 'productId is required' });
     }
-    
-    if (!product.inStock) {
-      return res.status(400).json({ message: 'Product is out of stock' });
-    }
-    
-    let cart = await Cart.findOne({ sessionId: req.params.sessionId });
-    
-    if (!cart) {
-      cart = new Cart({ sessionId: req.params.sessionId, items: [] });
-    }
-    
-    // Check if item already exists in cart
-    const existingItem = cart.items.find(
-      item => item.product.toString() === productId
-    );
-    
-    if (existingItem) {
-      existingItem.quantity += quantity;
+
+    const { data: product, error: productError } = await supabase
+      .from('products')
+      .select('id, in_stock')
+      .eq('id', productId)
+      .maybeSingle();
+    if (productError) throw productError;
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (!product.in_stock) return res.status(400).json({ message: 'Product is out of stock' });
+
+    const { data: existing, error: existingError } = await supabase
+      .from('cart_items')
+      .select('id, quantity')
+      .eq('session_id', sessionId)
+      .eq('product_id', productId)
+      .maybeSingle();
+    if (existingError) throw existingError;
+
+    if (existing) {
+      const { error: updateError } = await supabase
+        .from('cart_items')
+        .update({ quantity: existing.quantity + quantity })
+        .eq('id', existing.id);
+      if (updateError) throw updateError;
     } else {
-      cart.items.push({ product: productId, quantity });
+      const { error: insertError } = await supabase
+        .from('cart_items')
+        .insert({ session_id: sessionId, product_id: productId, quantity });
+      if (insertError) throw insertError;
     }
-    
-    await cart.save();
-    await cart.populate('items.product');
-    
+
+    const cart = await buildCartResponse(sessionId);
     res.json(cart);
   } catch (error) {
+    console.error('Error adding cart item:', error);
     res.status(400).json({ message: error.message });
   }
 });
 
-// Update item quantity
 router.put('/:sessionId/items/:itemId', async (req, res) => {
+  if (!isSupabaseEnabled()) {
+    try {
+      const { quantity } = req.body;
+      const { sessionId, itemId } = req.params;
+      if (quantity === undefined || quantity === null) {
+        return res.status(400).json({ message: 'Quantity is required' });
+      }
+      const cart = updateMemoryCartItem(sessionId, itemId, quantity);
+      return res.json(cart);
+    } catch (error) {
+      const status = error.status || 400;
+      return res.status(status).json({ message: error.message });
+    }
+  }
   try {
     const { quantity } = req.body;
-    
+    const { sessionId, itemId } = req.params;
+
     if (quantity === undefined || quantity === null) {
       return res.status(400).json({ message: 'Quantity is required' });
     }
-    
-    const cart = await Cart.findOne({ sessionId: req.params.sessionId });
-    
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
-    
-    const itemId = req.params.itemId;
-    const item = cart.items.id(itemId);
-    
-    if (!item) {
-      return res.status(404).json({ message: 'Item not found in cart' });
-    }
-    
+
     if (quantity <= 0) {
-      item.remove();
+      const { error } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq('id', itemId)
+        .eq('session_id', sessionId);
+      if (error) throw error;
     } else {
-      item.quantity = quantity;
+      const { error } = await supabase
+        .from('cart_items')
+        .update({ quantity })
+        .eq('id', itemId)
+        .eq('session_id', sessionId);
+      if (error) throw error;
     }
-    
-    await cart.save();
-    await cart.populate('items.product');
-    
+
+    const cart = await buildCartResponse(sessionId);
     res.json(cart);
   } catch (error) {
     console.error('Error updating cart item:', error);
@@ -100,42 +158,41 @@ router.put('/:sessionId/items/:itemId', async (req, res) => {
   }
 });
 
-// Remove item from cart
 router.delete('/:sessionId/items/:itemId', async (req, res) => {
+  if (!isSupabaseEnabled()) {
+    const cart = removeMemoryCartItem(req.params.sessionId, req.params.itemId);
+    return res.json(cart);
+  }
   try {
-    const cart = await Cart.findOne({ sessionId: req.params.sessionId });
-    
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
-    
-    const itemId = req.params.itemId;
-    const item = cart.items.id(itemId);
-    
-    if (!item) {
-      return res.status(404).json({ message: 'Item not found in cart' });
-    }
-    
-    item.remove();
-    await cart.save();
-    await cart.populate('items.product');
-    
+    const { sessionId, itemId } = req.params;
+    const { error } = await supabase
+      .from('cart_items')
+      .delete()
+      .eq('id', itemId)
+      .eq('session_id', sessionId);
+    if (error) throw error;
+    const cart = await buildCartResponse(sessionId);
     res.json(cart);
   } catch (error) {
-    console.error('Error removing item from cart:', error);
+    console.error('Error removing cart item:', error);
     res.status(400).json({ message: error.message || 'Failed to remove item from cart' });
   }
 });
 
-// Clear cart
 router.delete('/:sessionId', async (req, res) => {
+  if (!isSupabaseEnabled()) {
+    clearMemoryCart(req.params.sessionId);
+    return res.json({ message: 'Cart cleared successfully' });
+  }
   try {
-    const cart = await Cart.findOneAndDelete({ sessionId: req.params.sessionId });
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
+    const { error } = await supabase
+      .from('cart_items')
+      .delete()
+      .eq('session_id', req.params.sessionId);
+    if (error) throw error;
     res.json({ message: 'Cart cleared successfully' });
   } catch (error) {
+    console.error('Error clearing cart:', error);
     res.status(500).json({ message: error.message });
   }
 });

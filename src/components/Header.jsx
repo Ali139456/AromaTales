@@ -1,112 +1,207 @@
-import React, { useState, memo } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import React, { useState, memo, useEffect, useCallback } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import CartModal from './CartModal'
+import { useAuth } from '../context/AuthContext'
 import './Header.css'
 
-const Header = ({ cartCount, cart, removeFromCart, updateQuantity, onCheckout }) => {
+const HASH_SECTIONS = ['#collections', '#reviews', '#about', '#featured']
+
+function Header({ cartCount, cart, removeFromCart, updateQuantity, onCheckout }) {
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
-  const navigate = useNavigate()
 
-  const handleNavClick = (path, e) => {
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
     setIsMobileMenuOpen(false)
-    if (location.pathname === path) {
-      e.preventDefault()
-      // If already on the page, scroll to section
-      if (path === '/') {
-        const hash = e.target.getAttribute('data-hash')
-        if (hash) {
-          const element = document.querySelector(hash)
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth' })
-          }
-        }
-      }
+  }, [location.pathname, location.hash])
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
     }
-  }
+  }, [isMobileMenuOpen])
+
+  const { user, isAdmin } = useAuth()
+
+  const hash = location.hash || ''
+  const homeExactActive =
+    location.pathname === '/' && !HASH_SECTIONS.includes(hash)
+
+  const linkCls = useCallback(
+    ({ isActive }) => `minimal-drawer-link${isActive ? ' minimal-drawer-link--active' : ''}`,
+    []
+  )
+
+  const drawerHashActive = (expectedHash) =>
+    location.pathname === '/' && hash === expectedHash ? ' minimal-drawer-link--active' : ''
 
   return (
     <>
-      <header className="header">
-        <div className="header-container">
-          <Link to="/" className="logo" onClick={() => setIsMobileMenuOpen(false)}>
-            <img 
-              src="/assets/images/logo/Aroma Tales Logo.png" 
-              alt="Logo" 
-              loading="eager"
-              onError={(e) => {
-                e.target.src = "/assets/images/logo/aromalogo_Black.png"
-              }}
-            />
-          </Link>
-          
-          <nav className={`nav ${isMobileMenuOpen ? 'nav-open' : ''}`}>
-            <Link 
-              to="/" 
-              onClick={(e) => handleNavClick('/', e)}
-              data-hash="#home"
-            >
-              Home
-            </Link>
-            <Link 
-              to="/" 
-              onClick={(e) => handleNavClick('/', e)}
-              data-hash="#products"
-            >
-              Products
-            </Link>
-            <Link 
-              to="/" 
-              onClick={(e) => handleNavClick('/', e)}
-              data-hash="#reviews"
-            >
-              Reviews
-            </Link>
-            <Link 
-              to="/" 
-              onClick={(e) => handleNavClick('/', e)}
-              data-hash="#about"
-            >
-              About
-            </Link>
-            <Link 
-              to="/contact" 
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Contact
-            </Link>
-          </nav>
+      <header className={`header ${scrolled ? 'header--scrolled' : ''}`} role="banner">
+        {isMobileMenuOpen && (
+          <button
+            type="button"
+            className="mobile-backdrop"
+            aria-label="Close menu"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+        <div className="header-track">
+          <div className="header-shell">
+            <div className="header-zone header-zone--left">
+              <button
+                type="button"
+                className={`header-menu-btn ${isMobileMenuOpen ? 'header-menu-btn--open' : ''}`}
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="minimal-nav"
+                aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+              >
+                <span />
+                <span />
+              </button>
+              <NavLink to="/shop" className={({ isActive }) => `header-shop${isActive ? ' header-shop--active' : ''}`}>
+                Shop
+              </NavLink>
+            </div>
 
-          <div className="header-actions">
-            <button 
-              className="cart-button" 
-              onClick={() => setIsCartOpen(true)}
-              aria-label="Shopping cart"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <path d="M16 10a4 4 0 0 1-8 0"></path>
-              </svg>
-              {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
-            </button>
-            
-            <button 
-              className={`mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
+            <div className="header-brand-block">
+              <span className="header-brand-eyebrow">Premium fragrance</span>
+              <Link to="/" className="header-brand" onClick={() => setIsMobileMenuOpen(false)} aria-label="Aroma Tales home">
+                <img
+                  src="/assets/images/logo/aromalogo_Black.png"
+                  alt="Aroma Tales"
+                  width={200}
+                  height={48}
+                  loading="eager"
+                  decoding="async"
+                />
+              </Link>
+            </div>
+
+            <div className="header-zone header-zone--right">
+              <div className="header-auth">
+                {!user && (
+                  <Link to="/sign-in" className="header-auth-link">
+                    Sign in
+                  </Link>
+                )}
+                {user && isAdmin && (
+                  <Link to="/admin" className="header-auth-link">
+                    Admin
+                  </Link>
+                )}
+                {user && (
+                  <Link to="/account" className="header-auth-link">
+                    Account
+                  </Link>
+                )}
+              </div>
+              <Link to="/contact" className="header-icon-btn" aria-label="Contact" title="Contact">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.35" />
+                  <path
+                    d="M5.5 20c.8-3.2 3.4-5 6.5-5s5.7 1.8 6.5 5"
+                    stroke="currentColor"
+                    strokeWidth="1.35"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </Link>
+              <Link to="/shop" className="header-icon-btn" aria-label="Browse shop" title="Browse">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.35" />
+                  <path d="M20 20l-4.2-4.2" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" />
+                </svg>
+              </Link>
+              <button
+                type="button"
+                className="header-icon-btn header-icon-btn--cart"
+                onClick={() => setIsCartOpen(true)}
+                aria-label={`Shopping bag${cartCount > 0 ? `, ${cartCount} items` : ''}`}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M6 8h12l-1 12H7L6 8z"
+                    stroke="currentColor"
+                    strokeWidth="1.35"
+                    strokeLinejoin="round"
+                  />
+                  <path d="M9 8V6a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" />
+                </svg>
+                {cartCount > 0 && <span className="header-cart-badge">{cartCount > 99 ? '99+' : cartCount}</span>}
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="minimal-nav"
+            className={`minimal-drawer ${isMobileMenuOpen ? 'minimal-drawer--open' : ''}`}
+            aria-hidden={!isMobileMenuOpen}
+          >
+            <div className="minimal-drawer-inner">
+              <p className="minimal-drawer-label">Explore</p>
+              <NavLink
+                to="/"
+                end
+                className={() => `minimal-drawer-link${homeExactActive ? ' minimal-drawer-link--active' : ''}`}
+              >
+                Home
+              </NavLink>
+              <NavLink to="/shop" className={linkCls}>
+                Shop
+              </NavLink>
+              <Link
+                to={{ pathname: '/', hash: 'collections' }}
+                className={`minimal-drawer-link${drawerHashActive('#collections')}`}
+              >
+                Collections
+              </Link>
+              <Link to={{ pathname: '/', hash: 'featured' }} className={`minimal-drawer-link${drawerHashActive('#featured')}`}>
+                Featured
+              </Link>
+              <Link to={{ pathname: '/', hash: 'reviews' }} className={`minimal-drawer-link${drawerHashActive('#reviews')}`}>
+                Reviews
+              </Link>
+              <Link to={{ pathname: '/', hash: 'about' }} className={`minimal-drawer-link${drawerHashActive('#about')}`}>
+                Philosophy
+              </Link>
+              <NavLink to="/contact" className={linkCls}>
+                Contact
+              </NavLink>
+              {!user && (
+                <NavLink to="/sign-in" className={linkCls}>
+                  Sign in
+                </NavLink>
+              )}
+              {user && isAdmin && (
+                <NavLink to="/admin" className={linkCls}>
+                  Admin
+                </NavLink>
+              )}
+              {user && (
+                <NavLink to="/account" className={linkCls}>
+                  Account
+                </NavLink>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
-      <CartModal 
-        isOpen={isCartOpen} 
+      <CartModal
+        isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cart={cart}
         removeFromCart={removeFromCart}

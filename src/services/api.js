@@ -61,17 +61,7 @@ export const addToCart = async (sessionId, productId, quantity = 1) => {
 
 export const updateCartItem = async (sessionId, itemId, quantity) => {
   try {
-    // Ensure itemId is a clean string
-    let cleanItemId = itemId
-    if (itemId && typeof itemId === 'object') {
-      cleanItemId = itemId.toString()
-    }
-    if (cleanItemId && typeof cleanItemId === 'string') {
-      // Remove any trailing colon and numbers (e.g., "id:1" -> "id")
-      cleanItemId = cleanItemId.split(':')[0]
-    }
-    
-    const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/items/${encodeURIComponent(cleanItemId)}`, {
+    const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/items/${encodeURIComponent(itemId)}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -91,17 +81,7 @@ export const updateCartItem = async (sessionId, itemId, quantity) => {
 
 export const removeFromCart = async (sessionId, itemId) => {
   try {
-    // Ensure itemId is a clean string
-    let cleanItemId = itemId
-    if (itemId && typeof itemId === 'object') {
-      cleanItemId = itemId.toString()
-    }
-    if (cleanItemId && typeof cleanItemId === 'string') {
-      // Remove any trailing colon and numbers (e.g., "id:1" -> "id")
-      cleanItemId = cleanItemId.split(':')[0]
-    }
-    
-    const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/items/${encodeURIComponent(cleanItemId)}`, {
+    const response = await fetch(`${API_BASE_URL}/cart/${sessionId}/items/${encodeURIComponent(itemId)}`, {
       method: 'DELETE',
     });
     if (!response.ok) {
@@ -116,25 +96,109 @@ export const removeFromCart = async (sessionId, itemId) => {
 };
 
 // Order API
-export const createOrder = async (orderData) => {
+export const createOrder = async (orderData, accessToken) => {
   try {
+    const headers = {
+      'Content-Type': 'application/json'
+    }
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`
+    }
     const response = await fetch(`${API_BASE_URL}/orders`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(orderData),
-    });
+      headers,
+      body: JSON.stringify(orderData)
+    })
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to create order' }));
-      throw new Error(errorData.message || 'Failed to create order');
+      const errorData = await response.json().catch(() => ({ message: 'Failed to create order' }))
+      throw new Error(errorData.message || 'Failed to create order')
     }
-    return await response.json();
+    return await response.json()
   } catch (error) {
-    console.error('Error creating order:', error);
-    throw error;
+    console.error('Error creating order:', error)
+    throw error
   }
-};
+}
+
+export const fetchMyOrders = async (accessToken) => {
+  const response = await fetch(`${API_BASE_URL}/orders/me`, {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err.message || 'Failed to load orders')
+  }
+  return response.json()
+}
+
+const adminAuth = (token) => ({
+  Authorization: `Bearer ${token}`,
+  'Content-Type': 'application/json'
+})
+
+export const fetchAdminProducts = async (accessToken) => {
+  const response = await fetch(`${API_BASE_URL}/admin/products`, {
+    headers: adminAuth(accessToken)
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err.message || 'Failed to load products')
+  }
+  return response.json()
+}
+
+export const createAdminProduct = async (accessToken, payload) => {
+  const response = await fetch(`${API_BASE_URL}/admin/products`, {
+    method: 'POST',
+    headers: adminAuth(accessToken),
+    body: JSON.stringify(payload)
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err.message || 'Failed to create product')
+  }
+  return response.json()
+}
+
+export const updateAdminProduct = async (accessToken, id, payload) => {
+  const response = await fetch(`${API_BASE_URL}/admin/products/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    headers: adminAuth(accessToken),
+    body: JSON.stringify(payload)
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err.message || 'Failed to update product')
+  }
+  return response.json()
+}
+
+export const deleteAdminProduct = async (accessToken, id) => {
+  const response = await fetch(`${API_BASE_URL}/admin/products/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` }
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err.message || 'Failed to delete product')
+  }
+  return response.json()
+}
+
+export const uploadAdminProductImage = async (accessToken, file) => {
+  const body = new FormData()
+  body.append('image', file)
+  const response = await fetch(`${API_BASE_URL}/admin/upload-image`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err.message || 'Upload failed')
+  }
+  return response.json()
+}
 
 // Contact form API
 export const sendContactMessage = async (contactData) => {

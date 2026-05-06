@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import { createOrder, addToCart as addToCartAPI } from '../services/api'
+import { CONTACT_EMAIL } from '../config/site'
+import { useAuth } from '../context/AuthContext'
 import './CheckoutModal.css'
 
 const CheckoutModal = ({ isOpen, onClose, cart, total, onOrderSuccess }) => {
+  const { accessToken } = useAuth()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -109,7 +112,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total, onOrderSuccess }) => {
         notes: formData.notes.trim() || ''
       }
 
-      const order = await createOrder(orderData)
+      const order = await createOrder(orderData, accessToken || undefined)
 
       // Call success callback
       if (onOrderSuccess) {
@@ -138,7 +141,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total, onOrderSuccess }) => {
       } else if (error.message.includes('network') || error.message.includes('fetch')) {
         errorMessage += 'Network error. Please check your internet connection and try again.'
       } else {
-        errorMessage += error.message || 'Please try again or contact us at info.aromatales@gmail.com or WhatsApp: +92 333 1290243'
+        errorMessage += error.message || `Please try again or contact us at ${CONTACT_EMAIL} or WhatsApp: +92 333 1290243`
       }
       
       alert(errorMessage)

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { sendContactMessage } from '../services/api'
+import { CONTACT_EMAIL } from '../config/site'
 import './Contact.css'
 
 const Contact = () => {
@@ -94,7 +95,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h4>Email</h4>
-                  <a href="mailto:info.aromatales@gmail.com">info.aromatales@gmail.com</a>
+                  <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
                 </div>
               </div>
 

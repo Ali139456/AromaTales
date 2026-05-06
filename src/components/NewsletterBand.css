@@ -1,0 +1,117 @@
+.news-band {
+  padding: 0 1.25rem clamp(3.5rem, 8vw, 5.5rem);
+  background: var(--surface-1);
+}
+
+.news-band-card {
+  position: relative;
+  max-width: 1120px;
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 280px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: clamp(2rem, 5vw, 3.5rem);
+}
+
+.news-band-media {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(247, 243, 235, 0.05) 0%, rgba(44, 36, 25, 0.25) 45%, rgba(44, 36, 25, 0.45) 100%),
+    url('/assets/images/products/xaeemah.jpg') center / cover no-repeat;
+}
+
+.news-band-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(61, 42, 31, 0.55) 100%);
+  pointer-events: none;
+}
+
+.news-band-content {
+  position: relative;
+  z-index: 1;
+  max-width: min(100%, 480px);
+  text-align: left;
+}
+
+.news-band-content h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  font-weight: 500;
+  color: #faf6f0;
+  margin-bottom: 1.25rem;
+  line-height: 1.2;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.25);
+}
+
+.news-band-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.news-band-form input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 2px;
+  background: rgba(253, 251, 247, 0.95);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.news-band-form input::placeholder {
+  color: #a89b8f;
+}
+
+.news-band-form .landing-btn {
+  flex-shrink: 0;
+  background: var(--btn-primary);
+  border-color: var(--btn-primary);
+}
+
+.news-band-note {
+  margin-top: 0.85rem;
+  font-size: 0.8rem;
+  color: rgba(250, 246, 240, 0.85);
+}
+
+.news-band-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  .news-band-card {
+    justify-content: flex-start;
+    padding: 2rem 1.25rem;
+  }
+
+  .news-band-media {
+    background-position: 30% center;
+  }
+
+  .news-band-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .news-band-form .landing-btn {
+    width: 100%;
+  }
+}

@@ -1,5 +1,5 @@
 import express from 'express';
-import { sendContactEmail } from '../utils/email.js';
+import { sendContactEmail, ADMIN_EMAIL } from '../utils/email.js';
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
   } catch (error) {
     console.error('Error sending contact email:', error);
     res.status(500).json({ 
-      message: 'Failed to send message. Please try again or contact us directly at info.aromatales@gmail.com' 
+      message: `Failed to send message. Please try again or contact us directly at ${ADMIN_EMAIL}` 
     });
   }
 });

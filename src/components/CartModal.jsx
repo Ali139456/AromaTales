@@ -34,26 +34,10 @@ const CartModal = ({ isOpen, onClose, cart, removeFromCart, updateQuantity, onCh
                 {cart.map((item, index) => {
                   const product = item.product || item
                   const productId = product._id || product.id
-                  
-                  // MongoDB subdocuments use lowercase .id for the string ID
-                  // Try .id first (string), then _id (may be ObjectId), then fallback
-                  let itemId = item.id || item._id?.toString() || item._id || item.id
-                  
-                  // Convert to string if it's an object
-                  if (itemId && typeof itemId === 'object' && itemId.toString) {
-                    itemId = itemId.toString()
-                  }
-                  
-                  // Ensure it's a string and clean it
-                  if (itemId) {
-                    itemId = String(itemId).split(':')[0].split('.')[0].trim()
-                  } else {
-                    // Last resort fallback
-                    itemId = `temp_${index}_${Date.now()}`
-                  }
-                  
+                  const itemId = item._id || item.id || `temp_${index}_${productId}`
+
                   return (
-                    <div key={itemId || productId} className="cart-item">
+                    <div key={itemId} className="cart-item">
                       <img 
                         src={product.image} 
                         alt={product.name}

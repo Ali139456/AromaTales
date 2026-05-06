@@ -1,0 +1,287 @@
+.collections {
+  --collections-gold: #a68966;
+  --collections-gold-soft: rgba(166, 137, 102, 0.14);
+  padding: clamp(4.5rem, 11vw, 8rem) clamp(1.25rem, 4vw, 2rem);
+  background: #ffffff;
+}
+
+.collections-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.collections-head {
+  text-align: center;
+  margin-bottom: clamp(2.75rem, 7vw, 4rem);
+  max-width: 38rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.collections-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 4.5vw, 3rem);
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 0.65rem;
+  line-height: 1.12;
+}
+
+.collections-sub {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.collections-stage {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.collections-new-tag {
+  position: absolute;
+  left: clamp(0rem, 1vw, 0.5rem);
+  top: clamp(2rem, 8%, 3.5rem);
+  z-index: 5;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--collections-gold);
+  margin: 0;
+  pointer-events: none;
+}
+
+.collections-collage {
+  position: relative;
+  min-height: clamp(480px, 62vw, 640px);
+  margin-top: 1rem;
+}
+
+.collections-branch {
+  position: absolute;
+  inset: -4% -6% -6% -4%;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.collections-branch-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.collections-vertical-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6.5vw, 4.25rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--collections-gold);
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 40px rgba(255, 255, 255, 0.9);
+}
+
+.collections-card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  min-height: inherit;
+}
+
+.collections-card-wrap {
+  position: absolute;
+  margin: 0;
+  list-style: none;
+  display: block;
+}
+
+.collections-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: clamp(22px, 3.5vw, 34px);
+  overflow: hidden;
+  border: 1px solid rgba(44, 36, 25, 0.08);
+  background: var(--surface-2);
+  box-shadow:
+    0 20px 50px rgba(44, 36, 25, 0.1),
+    0 2px 0 rgba(255, 255, 255, 0.6) inset;
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.35s ease;
+}
+
+.collections-card:focus-visible {
+  outline: 2px solid var(--collections-gold);
+  outline-offset: 4px;
+}
+
+.collections-card:hover {
+  transform: scale(1.02);
+  box-shadow:
+    0 28px 64px rgba(44, 36, 25, 0.14),
+    0 2px 0 rgba(255, 255, 255, 0.6) inset;
+}
+
+.collections-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+  filter: saturate(0.94);
+}
+
+.collections-card:hover img {
+  transform: scale(1.06);
+}
+
+.collections-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(188deg, transparent 35%, rgba(44, 36, 25, 0.5) 100%);
+  pointer-events: none;
+}
+
+.collections-card-label {
+  position: absolute;
+  left: clamp(1rem, 3%, 1.35rem);
+  bottom: clamp(1rem, 3%, 1.35rem);
+  z-index: 1;
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fdfbf7;
+}
+
+/* Editorial collage positions — asymmetric overlap */
+.collections-card--tl {
+  left: 0;
+  top: 8%;
+  width: 32%;
+  max-width: 280px;
+  aspect-ratio: 3 / 4;
+  z-index: 2;
+}
+
+.collections-card--tr {
+  right: 0;
+  top: 0;
+  width: 40%;
+  max-width: 360px;
+  aspect-ratio: 3 / 4.2;
+  z-index: 3;
+  margin-right: 2%;
+}
+
+.collections-card--bl {
+  left: 6%;
+  bottom: 0;
+  width: 44%;
+  max-width: 400px;
+  aspect-ratio: 5 / 4;
+  z-index: 2;
+  transform: translateY(4%);
+}
+
+.collections-card--br {
+  right: 0;
+  bottom: 2%;
+  width: 38%;
+  max-width: 340px;
+  aspect-ratio: 5 / 4.2;
+  z-index: 1;
+}
+
+.collections-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(2.5rem, 5vw, 3.5rem);
+  padding-bottom: 0.25rem;
+}
+
+@media (max-width: 900px) {
+  .collections-new-tag {
+    position: static;
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .collections-stage {
+    padding-top: 0.5rem;
+  }
+
+  .collections-vertical-label {
+    position: static;
+    transform: none;
+    writing-mode: horizontal-tb;
+    text-align: center;
+    display: block;
+    margin: 0 auto 1.25rem;
+    font-size: clamp(2rem, 8vw, 2.75rem);
+    letter-spacing: 0.1em;
+    text-shadow: none;
+    color: var(--collections-gold);
+  }
+
+  .collections-collage {
+    min-height: unset;
+  }
+
+  .collections-branch {
+    display: none;
+  }
+
+  .collections-card-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    position: static;
+    min-height: unset;
+  }
+
+  .collections-card-wrap {
+    position: static;
+    width: 100% !important;
+    max-width: none !important;
+    aspect-ratio: unset;
+    transform: none !important;
+    margin: 0 !important;
+  }
+
+  .collections-card {
+    aspect-ratio: 3 / 4;
+  }
+
+  .collections-card--bl .collections-card,
+  .collections-card--br .collections-card {
+    aspect-ratio: 1 / 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .collections-card-list {
+    grid-template-columns: 1fr;
+  }
+
+  .collections-card,
+  .collections-card--bl .collections-card,
+  .collections-card--br .collections-card {
+    aspect-ratio: 4 / 5;
+  }
+}

@@ -1,30 +1,56 @@
 import React, { memo } from 'react'
+import { Link } from 'react-router-dom'
 import './Banner.css'
+
+const HERO_SRC = '/assets/images/hero/ocean-safari-hero-1920.jpg'
+const HERO_SRC_2X = '/assets/images/hero/ocean-safari-hero-2560.jpg'
 
 const Banner = memo(() => {
   return (
-    <section id="home" className="banner">
-      <div className="banner-overlay"></div>
-      <div className="banner-content">
-        <h1 className="banner-title">Once Upon A Scent</h1>
-        <p className="banner-subtitle">Discover Your Signature Fragrance</p>
-        <p className="banner-description">
-          Experience the essence of luxury with our curated collection of premium perfumes. 
-          Each bottle tells a unique story, crafted with passion and precision.
-        </p>
-        <a href="#products" className="banner-cta">Explore Collection</a>
-      </div>
-      <div className="banner-image-container">
-        <img 
-          src="/assets/images/banners/banner.jpg" 
-          alt="Premium Perfume"
-          className="banner-image"
+    <section id="home" className="hero">
+      <div className="hero-bleed">
+        <img
+          className="hero-bg-img"
+          src={HERO_SRC}
+          srcSet={`${HERO_SRC} 1920w, ${HERO_SRC_2X} 2560w`}
+          sizes="100vw"
+          alt="Ocean Safari by Aroma Tales"
+          width={1920}
+          height={960}
           loading="eager"
           decoding="async"
-          onError={(e) => {
-            e.target.src = "/assets/images/banners/banner2.jpg"
-          }}
+          fetchPriority="high"
         />
+        <div className="hero-bg-top" aria-hidden="true" />
+        <div className="hero-bg-grad" aria-hidden="true" />
+
+        <div className="hero-shell">
+          <div className="hero-copy-col">
+            <p className="hero-kicker">Premium fragrance</p>
+            <h1 className="hero-heading">
+              Fragrance,
+              <br />
+              world class
+            </h1>
+            <p className="hero-text">
+              Ocean Safari — extrait de parfum with the clarity of cool water, the glow of golden amber, and a silhouette
+              that lingers on skin like light on stone.
+            </p>
+            <div className="hero-actions">
+              <Link to="/product/ocean-safari" className="landing-btn hero-cta-primary">
+                Buy the scent
+              </Link>
+              <Link to="/shop" className="landing-btn landing-btn--ghost hero-cta-ghost">
+                View all
+              </Link>
+            </div>
+
+            <a href="#collections" className="hero-scroll-hint">
+              <span className="hero-scroll-line" aria-hidden="true" />
+              <span className="hero-scroll-label">Scroll down</span>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   )

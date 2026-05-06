@@ -1,12 +1,79 @@
 import express from 'express';
-import Order from '../models/Order.js';
-import Cart from '../models/Cart.js';
+import supabase, { isSupabaseEnabled } from '../config/supabase.js';
 import { sendOrderEmail, sendOrderConfirmationEmail } from '../utils/email.js';
+import { optionalAuth, requireAuth, requireAdmin, getProfile } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Create new order
-router.post('/', async (req, res) => {
+const requireSupabase = (res) => {
+  if (!isSupabaseEnabled()) {
+    res.status(503).json({ message: 'Database not configured' });
+    return false;
+  }
+  return true;
+};
+
+const generateOrderNumber = async () => {
+  const { count } = await supabase
+    .from('orders')
+    .select('id', { count: 'exact', head: true });
+  const sequence = String((count || 0) + 1).padStart(4, '0');
+  return `AR-${Date.now()}-${sequence}`;
+};
+
+const fetchOrderById = async (id) => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*, items:order_items(*, product:products(*))')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+};
+
+const formatProduct = (product) => {
+  if (!product) return product;
+  return {
+    _id: product.id,
+    id: product.id,
+    name: product.name,
+    category: product.category,
+    price: Number(product.price),
+    description: product.description,
+    image: product.image,
+    inStock: product.in_stock
+  };
+};
+
+const formatOrderForClient = (order) => {
+  if (!order) return order;
+  return {
+    _id: order.id,
+    id: order.id,
+    orderNumber: order.order_number,
+    sessionId: order.session_id,
+    userId: order.user_id || null,
+    customer: order.customer,
+    items: (order.items || []).map((item) => ({
+      _id: item.id,
+      id: item.id,
+      product: formatProduct(item.product),
+      quantity: item.quantity,
+      price: Number(item.price)
+    })),
+    paymentMethod: order.payment_method,
+    subtotal: Number(order.subtotal),
+    shipping: Number(order.shipping),
+    total: Number(order.total),
+    status: order.status,
+    notes: order.notes,
+    createdAt: order.created_at,
+    updatedAt: order.updated_at
+  };
+};
+
+router.post('/', optionalAuth, async (req, res) => {
+  if (!requireSupabase(res)) return;
   try {
     const { sessionId, customer, paymentMethod, notes } = req.body;
 
@@ -14,138 +81,173 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Session ID is required' });
     }
 
-    // Get cart items
-    let cart = await Cart.findOne({ sessionId }).populate('items.product');
-    
-    // If cart doesn't exist on backend but order data has items, we need to handle this
-    // For now, return error asking user to add items via the cart API first
-    if (!cart || !cart.items || cart.items.length === 0) {
-      return res.status(400).json({ message: 'Cart is empty or not found. Please add items to your cart before checkout.' });
-    }
-
-    // Validate customer data
     if (!customer || !customer.name || !customer.email || !customer.phone || !customer.address) {
       return res.status(400).json({ message: 'Complete customer information is required' });
     }
 
-    // Validate that all products exist and have prices
-    for (const item of cart.items) {
+    const { data: cartItems, error: cartError } = await supabase
+      .from('cart_items')
+      .select('id, quantity, product:products(*)')
+      .eq('session_id', sessionId);
+    if (cartError) throw cartError;
+
+    if (!cartItems || cartItems.length === 0) {
+      return res.status(400).json({
+        message: 'Cart is empty or not found. Please add items to your cart before checkout.'
+      });
+    }
+
+    for (const item of cartItems) {
       if (!item.product) {
-        return res.status(400).json({ message: 'One or more products in cart are invalid or no longer available' });
+        return res.status(400).json({
+          message: 'One or more products in cart are invalid or no longer available'
+        });
       }
       if (!item.product.price || item.product.price <= 0) {
         return res.status(400).json({ message: 'Invalid product price found in cart' });
       }
     }
 
-    // Calculate totals
-    const subtotal = cart.items.reduce((sum, item) => {
-      const itemPrice = item.product?.price || 0;
-      const itemQuantity = item.quantity || 0;
-      return sum + (itemPrice * itemQuantity);
-    }, 0);
-
-    const shipping = 0; // Free shipping
+    const subtotal = cartItems.reduce(
+      (sum, item) => sum + Number(item.product.price) * (item.quantity || 0),
+      0
+    );
+    const shipping = 0;
     const total = subtotal + shipping;
 
-    // Create order with items
-    const orderItems = cart.items.map(item => ({
-      product: item.product._id,
+    const orderNumber = await generateOrderNumber();
+
+    const userId = req.user?.id || null;
+
+    const { data: orderRow, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        order_number: orderNumber,
+        session_id: sessionId,
+        user_id: userId,
+        customer,
+        payment_method: paymentMethod || 'COD',
+        subtotal,
+        shipping,
+        total,
+        status: 'Pending',
+        notes
+      })
+      .select()
+      .single();
+    if (orderError) throw orderError;
+
+    const orderItemsPayload = cartItems.map((item) => ({
+      order_id: orderRow.id,
+      product_id: item.product.id,
       quantity: item.quantity,
       price: item.product.price
     }));
 
-    const order = new Order({
-      sessionId,
-      customer,
-      items: orderItems,
-      paymentMethod: paymentMethod || 'COD',
-      subtotal,
-      shipping,
-      total,
-      notes
-    });
+    const { error: itemsError } = await supabase.from('order_items').insert(orderItemsPayload);
+    if (itemsError) throw itemsError;
 
-    await order.save();
-    await order.populate('items.product');
+    await supabase.from('cart_items').delete().eq('session_id', sessionId);
 
-    // Send email notifications
+    const fullOrder = await fetchOrderById(orderRow.id);
+    const formatted = formatOrderForClient(fullOrder);
+
     try {
-      await sendOrderEmail(order); // Send to admin
-      await sendOrderConfirmationEmail(order); // Send to customer
+      await sendOrderEmail(formatted);
+      await sendOrderConfirmationEmail(formatted);
     } catch (emailError) {
-      console.error('Email sending failed:', emailError);
-      // Continue even if email fails
+      console.error('Email sending failed (order still saved):', emailError);
     }
 
-    // Clear cart after order is placed
-    cart.items = [];
-    await cart.save();
-
-    res.status(201).json(order);
+    res.status(201).json(formatted);
   } catch (error) {
     console.error('Error creating order:', error);
-    // Return appropriate error status
-    const statusCode = error.name === 'ValidationError' ? 400 : 500;
-    res.status(statusCode).json({ 
-      message: error.message || 'An error occurred while creating the order. Please try again.' 
+    res.status(500).json({
+      message: error.message || 'An error occurred while creating the order. Please try again.'
     });
   }
 });
 
-// Get all orders (for admin)
-router.get('/', async (req, res) => {
+router.get('/me', requireAuth, async (req, res) => {
+  if (!requireSupabase(res)) return;
   try {
-    const orders = await Order.find({})
-      .populate('items.product')
-      .sort({ createdAt: -1 });
-    res.json(orders);
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, items:order_items(*, product:products(*))')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json((data || []).map(formatOrderForClient));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// Get order by ID
-router.get('/:id', async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id).populate('items.product');
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-    res.json(order);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get orders by session
 router.get('/session/:sessionId', async (req, res) => {
+  if (!requireSupabase(res)) return;
   try {
-    const orders = await Order.find({ sessionId: req.params.sessionId })
-      .populate('items.product')
-      .sort({ createdAt: -1 });
-    res.json(orders);
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, items:order_items(*, product:products(*))')
+      .eq('session_id', req.params.sessionId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json((data || []).map(formatOrderForClient));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// Update order status
-router.put('/:id/status', async (req, res) => {
+router.get('/', requireAdmin, async (req, res) => {
+  if (!requireSupabase(res)) return;
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*, items:order_items(*, product:products(*))')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    res.json((data || []).map(formatOrderForClient));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.put('/:id/status', requireAdmin, async (req, res) => {
+  if (!requireSupabase(res)) return;
   try {
     const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true, runValidators: true }
-    ).populate('items.product');
-    
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-    res.json(order);
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ status })
+      .eq('id', req.params.id)
+      .select()
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return res.status(404).json({ message: 'Order not found' });
+    const fullOrder = await fetchOrderById(req.params.id);
+    res.json(formatOrderForClient(fullOrder));
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+router.get('/:id', requireAuth, async (req, res) => {
+  if (!requireSupabase(res)) return;
+  try {
+    const order = await fetchOrderById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    const profile = await getProfile(req.user.id);
+    const isAdmin = profile?.role === 'admin';
+    const isOwner = order.user_id && order.user_id === req.user.id;
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ message: 'You do not have access to this order' });
+    }
+
+    res.json(formatOrderForClient(order));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

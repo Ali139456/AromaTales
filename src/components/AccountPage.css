@@ -1,0 +1,138 @@
+.account-page {
+  padding: 4.5rem 1.25rem 4rem;
+  min-height: 50vh;
+  background: var(--surface-0);
+}
+
+.account-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.account-eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.account-page h1 {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  margin-bottom: 0.75rem;
+}
+
+.account-intro {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.account-intro strong {
+  color: var(--text);
+}
+
+.account-signout {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--accent);
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  margin-bottom: 2.5rem;
+}
+
+.account-signout:hover {
+  background: var(--accent-soft);
+}
+
+.account-orders h2 {
+  font-size: 1.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.account-muted {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.account-muted a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.account-error {
+  color: #6b2d2d;
+  margin-bottom: 1rem;
+}
+
+.account-order-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.account-order-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+}
+
+.account-order-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.65rem;
+}
+
+.account-order-num {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.account-order-meta {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.account-status {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--surface-1);
+  color: var(--text-muted);
+}
+
+.account-status--delivered {
+  background: rgba(61, 90, 61, 0.12);
+  color: #2d4a2d;
+}
+
+.account-status--cancelled {
+  background: rgba(139, 58, 58, 0.1);
+  color: #6b2d2d;
+}
+
+.account-line-items {
+  list-style: none;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+@media (max-width: 540px) {
+  .account-order-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .account-status {
+    margin-left: 0;
+  }
+}

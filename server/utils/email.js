@@ -1,219 +1,204 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create transporter (using Gmail) - only if credentials are available
-let transporter = null;
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'Aroma Tales <onboarding@resend.dev>';
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'info.aromatales@gmail.com';
 
-try {
-  const emailUser = process.env.EMAIL_USER || 'info.aromatales@gmail.com';
-  const emailPass = process.env.EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD;
-  
-  if (emailPass) {
-    transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: emailUser,
-        pass: emailPass
-      }
-    });
-    console.log('Email transporter configured');
-  } else {
-    console.warn('Email credentials not found - emails will be skipped');
-  }
-} catch (error) {
-  console.error('Error configuring email transporter:', error.message);
-  transporter = null;
+let resend = null;
+
+if (RESEND_API_KEY) {
+  resend = new Resend(RESEND_API_KEY);
+  console.log('Resend email client initialised');
+} else {
+  console.warn('RESEND_API_KEY not found - email notifications will be skipped');
 }
 
-// Send order notification email
-export const sendOrderEmail = async (order) => {
-  if (!transporter) {
-    console.log('Email transporter not available - skipping admin email');
-    return null;
-  }
-  
-  try {
-    const orderItemsHtml = order.items.map(item => {
-      const product = item.product;
+const buildOrderItemsRows = (order, includePrice = true) =>
+  order.items
+    .map((item) => {
+      const product = item.product || {};
+      const name = product.name || 'Product';
+      const lineTotal = (item.price * item.quantity).toLocaleString();
+      if (includePrice) {
+        return `
+          <tr>
+            <td style="padding:12px;border-bottom:1px solid #2a2a2a;color:#f5f5f5;">${name}</td>
+            <td style="padding:12px;border-bottom:1px solid #2a2a2a;color:#f5f5f5;text-align:center;">${item.quantity}</td>
+            <td style="padding:12px;border-bottom:1px solid #2a2a2a;color:#f5f5f5;text-align:right;">PKR ${item.price.toLocaleString()}</td>
+            <td style="padding:12px;border-bottom:1px solid #2a2a2a;color:#ffd700;text-align:right;">PKR ${lineTotal}</td>
+          </tr>`;
+      }
       return `
         <tr>
-          <td style="padding: 10px; border-bottom: 1px solid #ddd;">${product?.name || 'Product'}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">PKR ${item.price.toLocaleString()}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">PKR ${(item.price * item.quantity).toLocaleString()}</td>
-        </tr>
-      `;
-    }).join('');
+          <td style="padding:12px;border-bottom:1px solid #2a2a2a;color:#f5f5f5;">${name}</td>
+          <td style="padding:12px;border-bottom:1px solid #2a2a2a;color:#f5f5f5;text-align:center;">${item.quantity}</td>
+          <td style="padding:12px;border-bottom:1px solid #2a2a2a;color:#ffd700;text-align:right;">PKR ${lineTotal}</td>
+        </tr>`;
+    })
+    .join('');
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'info.aromatales@gmail.com',
-      to: 'info.aromatales@gmail.com',
+const wrapTemplate = (innerHtml) => `
+  <div style="font-family:'Inter',Arial,sans-serif;max-width:640px;margin:0 auto;background:#0a0a0a;color:#f5f5f5;padding:32px;border-radius:16px;border:1px solid #1f1f1f;">
+    <div style="text-align:center;margin-bottom:24px;">
+      <h1 style="margin:0;color:#ffd700;font-family:'Playfair Display',serif;letter-spacing:0.04em;">AROMA TALES</h1>
+      <p style="margin:4px 0 0 0;color:#a0a0a0;font-size:12px;letter-spacing:0.3em;text-transform:uppercase;">Once Upon A Scent</p>
+    </div>
+    ${innerHtml}
+    <div style="margin-top:32px;padding-top:16px;border-top:1px solid #1f1f1f;text-align:center;color:#777;font-size:12px;">
+      &copy; ${new Date().getFullYear()} Aroma Tales &middot; <a href="mailto:${ADMIN_EMAIL}" style="color:#ffd700;text-decoration:none;">${ADMIN_EMAIL}</a>
+    </div>
+  </div>
+`;
+
+export const sendOrderEmail = async (order) => {
+  if (!resend) {
+    console.log('Resend not configured - skipping admin order email');
+    return null;
+  }
+
+  try {
+    const itemsHtml = buildOrderItemsRows(order, true);
+    const html = wrapTemplate(`
+      <h2 style="color:#ffd700;margin-top:0;">New Order Received</h2>
+      <p style="color:#cfcfcf;"><strong style="color:#ffd700;">Order #:</strong> ${order.orderNumber}</p>
+      <p style="color:#cfcfcf;"><strong style="color:#ffd700;">Placed on:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
+
+      <h3 style="color:#ffd700;margin-top:24px;">Customer</h3>
+      <p style="color:#cfcfcf;line-height:1.6;">
+        <strong>${order.customer.name}</strong><br>
+        ${order.customer.email}<br>
+        ${order.customer.phone}<br>
+        ${order.customer.address.street}<br>
+        ${order.customer.address.city}${order.customer.address.postalCode ? ', ' + order.customer.address.postalCode : ''}<br>
+        ${order.customer.address.country}
+      </p>
+
+      <h3 style="color:#ffd700;margin-top:24px;">Items</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#141414;">
+            <th style="padding:12px;text-align:left;color:#ffd700;border-bottom:2px solid #ffd700;">Product</th>
+            <th style="padding:12px;text-align:center;color:#ffd700;border-bottom:2px solid #ffd700;">Qty</th>
+            <th style="padding:12px;text-align:right;color:#ffd700;border-bottom:2px solid #ffd700;">Unit</th>
+            <th style="padding:12px;text-align:right;color:#ffd700;border-bottom:2px solid #ffd700;">Total</th>
+          </tr>
+        </thead>
+        <tbody>${itemsHtml}</tbody>
+      </table>
+
+      <div style="margin-top:24px;padding:20px;background:#141414;border-radius:12px;">
+        <p style="margin:4px 0;color:#cfcfcf;"><strong>Payment:</strong> ${order.paymentMethod}</p>
+        <p style="margin:4px 0;color:#cfcfcf;"><strong>Subtotal:</strong> PKR ${order.subtotal.toLocaleString()}</p>
+        <p style="margin:4px 0;color:#cfcfcf;"><strong>Shipping:</strong> Free</p>
+        <p style="margin:8px 0 0 0;font-size:18px;color:#ffd700;"><strong>Total:</strong> PKR ${order.total.toLocaleString()}</p>
+      </div>
+
+      ${order.notes ? `<p style="margin-top:16px;color:#cfcfcf;"><strong style="color:#ffd700;">Notes:</strong> ${order.notes}</p>` : ''}
+    `);
+
+    const result = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: ADMIN_EMAIL,
       subject: `New Order: ${order.orderNumber}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #ffd700;">New Order Received!</h2>
-          <p><strong>Order Number:</strong> ${order.orderNumber}</p>
-          <p><strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
-          
-          <h3 style="color: #ffd700; margin-top: 30px;">Customer Information</h3>
-          <p><strong>Name:</strong> ${order.customer.name}</p>
-          <p><strong>Email:</strong> ${order.customer.email}</p>
-          <p><strong>Phone:</strong> ${order.customer.phone}</p>
-          <p><strong>Address:</strong><br>
-            ${order.customer.address.street}<br>
-            ${order.customer.address.city}${order.customer.address.postalCode ? ', ' + order.customer.address.postalCode : ''}<br>
-            ${order.customer.address.country}
-          </p>
-          
-          <h3 style="color: #ffd700; margin-top: 30px;">Order Details</h3>
-          <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-            <thead>
-              <tr style="background: #1a1a1a; color: #ffd700;">
-                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ffd700;">Product</th>
-                <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ffd700;">Quantity</th>
-                <th style="padding: 10px; text-align: right; border-bottom: 2px solid #ffd700;">Price</th>
-                <th style="padding: 10px; text-align: right; border-bottom: 2px solid #ffd700;">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${orderItemsHtml}
-            </tbody>
-          </table>
-          
-          <div style="margin-top: 20px; padding: 20px; background: #1a1a1a; border-radius: 8px;">
-            <p style="margin: 5px 0;"><strong>Payment Method:</strong> ${order.paymentMethod}</p>
-            <p style="margin: 5px 0;"><strong>Subtotal:</strong> PKR ${order.subtotal.toLocaleString()}</p>
-            <p style="margin: 5px 0;"><strong>Shipping:</strong> Free</p>
-            <p style="margin: 10px 0; font-size: 1.2em; color: #ffd700;"><strong>Total:</strong> PKR ${order.total.toLocaleString()}</p>
-          </div>
-          
-          ${order.notes ? `<p style="margin-top: 20px;"><strong>Notes:</strong> ${order.notes}</p>` : ''}
-        </div>
-      `
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Order email sent:', info.messageId);
-    return info;
+      html,
+      reply_to: order.customer.email
+    });
+    console.log('Admin order email sent:', result?.data?.id);
+    return result;
   } catch (error) {
-    console.error('Error sending order email:', error);
-    // Don't throw error - order should still be saved even if email fails
+    console.error('Error sending admin order email:', error);
     return null;
   }
 };
 
-// Send customer order confirmation email
 export const sendOrderConfirmationEmail = async (order) => {
-  if (!transporter) {
-    console.log('Email transporter not available - skipping customer confirmation email');
+  if (!resend) {
+    console.log('Resend not configured - skipping customer order email');
     return null;
   }
-  
-  try {
-    const orderItemsHtml = order.items.map(item => {
-      const product = item.product;
-      return `
-        <tr>
-          <td style="padding: 10px; border-bottom: 1px solid #ddd;">${product?.name || 'Product'}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-          <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: right;">PKR ${(item.price * item.quantity).toLocaleString()}</td>
-        </tr>
-      `;
-    }).join('');
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'info.aromatales@gmail.com',
+  try {
+    const itemsHtml = buildOrderItemsRows(order, false);
+    const html = wrapTemplate(`
+      <h2 style="color:#ffd700;margin-top:0;">Thank you for your order!</h2>
+      <p style="color:#cfcfcf;">Dear ${order.customer.name},</p>
+      <p style="color:#cfcfcf;">We've received your order and our team will contact you shortly to confirm delivery details.</p>
+
+      <div style="margin:24px 0;padding:20px;background:#141414;border-radius:12px;">
+        <p style="margin:4px 0;color:#cfcfcf;"><strong style="color:#ffd700;">Order #:</strong> ${order.orderNumber}</p>
+        <p style="margin:4px 0;color:#cfcfcf;"><strong style="color:#ffd700;">Placed on:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
+        <p style="margin:4px 0;color:#cfcfcf;"><strong style="color:#ffd700;">Payment:</strong> ${order.paymentMethod}</p>
+      </div>
+
+      <h3 style="color:#ffd700;">Order Summary</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#141414;">
+            <th style="padding:12px;text-align:left;color:#ffd700;border-bottom:2px solid #ffd700;">Product</th>
+            <th style="padding:12px;text-align:center;color:#ffd700;border-bottom:2px solid #ffd700;">Qty</th>
+            <th style="padding:12px;text-align:right;color:#ffd700;border-bottom:2px solid #ffd700;">Total</th>
+          </tr>
+        </thead>
+        <tbody>${itemsHtml}</tbody>
+      </table>
+
+      <div style="margin-top:24px;padding:20px;background:#141414;border-radius:12px;">
+        <p style="margin:4px 0;color:#cfcfcf;"><strong>Subtotal:</strong> PKR ${order.subtotal.toLocaleString()}</p>
+        <p style="margin:4px 0;color:#cfcfcf;"><strong>Shipping:</strong> Free</p>
+        <p style="margin:8px 0 0 0;font-size:18px;color:#ffd700;"><strong>Total:</strong> PKR ${order.total.toLocaleString()}</p>
+      </div>
+
+      <p style="margin-top:24px;color:#cfcfcf;">Questions? Reply to this email or reach us on WhatsApp at <strong style="color:#ffd700;">+92 333 1290243</strong>.</p>
+      <p style="color:#cfcfcf;">— The Aroma Tales Team</p>
+    `);
+
+    const result = await resend.emails.send({
+      from: FROM_EMAIL,
       to: order.customer.email,
       subject: `Order Confirmation - ${order.orderNumber}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #ffd700;">Thank You for Your Order!</h2>
-          <p>Dear ${order.customer.name},</p>
-          <p>We have received your order and will process it shortly.</p>
-          
-          <div style="margin: 30px 0; padding: 20px; background: #1a1a1a; border-radius: 8px;">
-            <p><strong>Order Number:</strong> ${order.orderNumber}</p>
-            <p><strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
-            <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
-          </div>
-          
-          <h3 style="color: #ffd700;">Order Summary</h3>
-          <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-            <thead>
-              <tr style="background: #1a1a1a; color: #ffd700;">
-                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ffd700;">Product</th>
-                <th style="padding: 10px; text-align: center; border-bottom: 2px solid #ffd700;">Quantity</th>
-                <th style="padding: 10px; text-align: right; border-bottom: 2px solid #ffd700;">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${orderItemsHtml}
-            </tbody>
-          </table>
-          
-          <div style="margin-top: 20px; padding: 20px; background: #1a1a1a; border-radius: 8px;">
-            <p style="margin: 5px 0;"><strong>Subtotal:</strong> PKR ${order.subtotal.toLocaleString()}</p>
-            <p style="margin: 5px 0;"><strong>Shipping:</strong> Free</p>
-            <p style="margin: 10px 0; font-size: 1.2em; color: #ffd700;"><strong>Total:</strong> PKR ${order.total.toLocaleString()}</p>
-          </div>
-          
-          <p style="margin-top: 30px;">We will contact you soon to confirm your order and delivery details.</p>
-          <p>If you have any questions, please contact us at <a href="mailto:info.aromatales@gmail.com">info.aromatales@gmail.com</a> or WhatsApp: +92 333 1290243</p>
-          
-          <p style="margin-top: 30px;">Best regards,<br>Aroma Tales Team</p>
-        </div>
-      `
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Confirmation email sent to customer:', info.messageId);
-    return info;
+      html
+    });
+    console.log('Customer confirmation email sent:', result?.data?.id);
+    return result;
   } catch (error) {
-    console.error('Error sending confirmation email:', error);
+    console.error('Error sending customer confirmation email:', error);
     return null;
   }
 };
 
-// Send contact form email
 export const sendContactEmail = async (contactData) => {
-  if (!transporter) {
-    console.log('Email transporter not available - contact form email skipped');
+  if (!resend) {
     throw new Error('Email service is not configured');
   }
-  
-  try {
-    const mailOptions = {
-      from: process.env.EMAIL_USER || 'info.aromatales@gmail.com',
-      to: 'info.aromatales@gmail.com',
-      replyTo: contactData.email,
-      subject: `Contact Form: ${contactData.subject || 'Inquiry'}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #ffd700;">New Contact Form Submission</h2>
-          
-          <div style="margin: 30px 0; padding: 20px; background: #1a1a1a; border-radius: 8px;">
-            <p style="margin: 10px 0;"><strong>Name:</strong> ${contactData.name}</p>
-            <p style="margin: 10px 0;"><strong>Email:</strong> <a href="mailto:${contactData.email}">${contactData.email}</a></p>
-            ${contactData.phone ? `<p style="margin: 10px 0;"><strong>Phone:</strong> ${contactData.phone}</p>` : ''}
-          </div>
-          
-          <h3 style="color: #ffd700; margin-top: 30px;">Message</h3>
-          <div style="margin: 20px 0; padding: 20px; background: #f5f5f5; border-radius: 8px; color: #333;">
-            <p style="white-space: pre-wrap; line-height: 1.6;">${contactData.message}</p>
-          </div>
-          
-          <p style="margin-top: 30px; color: #888; font-size: 0.9em;">
-            This message was sent from the Aroma Tales contact form. Reply directly to this email to respond to ${contactData.name}.
-          </p>
-        </div>
-      `
-    };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Contact email sent:', info.messageId);
-    return info;
+  try {
+    const html = wrapTemplate(`
+      <h2 style="color:#ffd700;margin-top:0;">New Contact Form Submission</h2>
+
+      <div style="margin:24px 0;padding:20px;background:#141414;border-radius:12px;">
+        <p style="margin:8px 0;color:#cfcfcf;"><strong style="color:#ffd700;">Name:</strong> ${contactData.name}</p>
+        <p style="margin:8px 0;color:#cfcfcf;"><strong style="color:#ffd700;">Email:</strong> <a href="mailto:${contactData.email}" style="color:#ffd700;">${contactData.email}</a></p>
+        ${contactData.phone ? `<p style="margin:8px 0;color:#cfcfcf;"><strong style="color:#ffd700;">Phone:</strong> ${contactData.phone}</p>` : ''}
+      </div>
+
+      <h3 style="color:#ffd700;">Message</h3>
+      <div style="margin:16px 0;padding:20px;background:#141414;border-radius:12px;color:#cfcfcf;line-height:1.7;white-space:pre-wrap;">${contactData.message}</div>
+
+      <p style="margin-top:24px;color:#777;font-size:12px;">Reply directly to this email to respond to ${contactData.name}.</p>
+    `);
+
+    const result = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: ADMIN_EMAIL,
+      subject: `Contact Form: ${contactData.subject || 'Inquiry'}`,
+      html,
+      reply_to: contactData.email
+    });
+    console.log('Contact email sent:', result?.data?.id);
+    return result;
   } catch (error) {
     console.error('Error sending contact email:', error);
     throw error;

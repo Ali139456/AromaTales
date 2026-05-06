@@ -1,13 +1,33 @@
 .reviews {
-  padding: 8rem 2rem;
-  background: var(--black);
+  padding: clamp(4rem, 8vw, 6rem) 2rem;
+  background: var(--surface-0);
   position: relative;
-  border-top: 1px solid rgba(255, 215, 0, 0.1);
+  border-top: 1px solid var(--border);
 }
 
 .reviews-container {
   max-width: 1400px;
   margin: 0 auto;
+}
+
+.reviews .section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.reviews .section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+
+.reviews .section-subtitle {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  max-width: 36rem;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
 .reviews-carousel-wrapper {
@@ -36,6 +56,7 @@
 }
 
 .review-card {
+  position: relative;
   flex: 0 0 calc(33.333% - 1.33rem);
   min-width: 0;
   width: 100%;
@@ -45,27 +66,26 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.7);
-  border: 2px solid rgba(255, 215, 0, 0.3);
+  background: var(--surface-0);
+  border: 1px solid var(--border);
   border-radius: 50%;
   width: 50px;
   height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-white);
+  color: var(--text);
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 10;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-soft);
   touch-action: manipulation;
 }
 
 .carousel-arrow:hover {
-  background: rgba(255, 215, 0, 0.2);
-  border-color: rgba(255, 215, 0, 0.6);
-  transform: translateY(-50%) scale(1.1);
+  background: var(--surface-2);
+  border-color: var(--accent-soft);
+  transform: translateY(-50%) scale(1.05);
 }
 
 .carousel-arrow:active {
@@ -161,7 +181,7 @@
   .carousel-arrow {
     width: 36px;
     height: 36px;
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--surface-0);
     border-width: 1.5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   }
@@ -295,19 +315,15 @@
 }
 
 .review-card {
-  background: var(--primary-dark-lighter);
-  border-radius: 32px;
+  background: var(--surface-0);
+  border-radius: var(--radius-lg);
   padding: 2.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow-soft);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   height: 100%;
-  border: 1px solid rgba(255, 215, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+  border: 1px solid var(--border);
 }
 
 .review-card::before {
@@ -321,14 +337,14 @@
   transform: scaleY(0);
   transform-origin: top;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 12px rgba(92, 67, 54, 0.2);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .review-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 60px rgba(255, 215, 0, 0.2), 0 0 40px rgba(255, 215, 0, 0.1);
-    border-color: rgba(255, 215, 0, 0.3);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-soft);
+    border-color: var(--accent-soft);
   }
 }
 
@@ -366,20 +382,20 @@
   height: 50px;
   border-radius: 50%;
   background: var(--primary-gold);
-  color: var(--primary-dark);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
   font-weight: 700;
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display), serif;
   flex-shrink: 0;
 }
 
 .reviewer-name {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--text-white);
+  color: var(--text);
   margin-bottom: 0.25rem;
 }
 
@@ -397,7 +413,7 @@
 
 .star {
   font-size: 1.2rem;
-  color: #ddd;
+  color: #e4e4e7;
   transition: color 0.3s ease;
 }
 
@@ -418,7 +434,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border);
 }
 
 .review-date {
@@ -429,13 +445,13 @@
 .reviews-summary {
   text-align: center;
   padding: 4rem 2rem;
-  background: var(--primary-dark-lighter);
+  background: var(--surface-0);
   border-radius: 32px;
-  color: var(--white);
+  color: var(--text);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 215, 0, 0.1);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
 }
 
 .reviews-summary::before {
@@ -500,7 +516,7 @@
 
 .rating-text {
   font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-muted);
   margin: 0;
 }
 

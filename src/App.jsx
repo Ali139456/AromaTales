@@ -1,14 +1,30 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Header from './components/Header'
 import Banner from './components/Banner'
-import Products from './components/Products'
+import FragranceDifference from './components/FragranceDifference'
+import CollectionShowcase from './components/CollectionShowcase'
+import ScentHarmony from './components/ScentHarmony'
+import FeaturedStrip from './components/FeaturedStrip'
+import PromoSplit from './components/PromoSplit'
+import NewsletterBand from './components/NewsletterBand'
+import AboutBand from './components/AboutBand'
+import Shop from './components/Shop'
 import Reviews from './components/Reviews'
 import Footer from './components/Footer'
 import CheckoutModal from './components/CheckoutModal'
 import WhatsAppButton from './components/WhatsAppButton'
 import ProductDetail from './components/ProductDetail'
 import Contact from './components/Contact'
+import HashScroller from './components/HashScroller'
+import OrderSuccessModal from './components/OrderSuccessModal'
+import SignIn from './components/SignIn'
+import SignUp from './components/SignUp'
+import AccountPage from './components/AccountPage'
+import ProtectedRoute from './components/ProtectedRoute'
+import AdminLayout from './components/admin/AdminLayout'
+import AdminProducts from './components/admin/AdminProducts'
+import AdminProductForm from './components/admin/AdminProductForm'
 import { getSessionId, getCart, addToCart as addToCartAPI, updateCartItem, removeFromCart as removeFromCartAPI } from './services/api'
 import './App.css'
 
@@ -28,25 +44,38 @@ function App() {
     loadCart()
   }, [sessionId])
 
+  const getItemId = (item) => item?._id || item?.id || null
+  const getItemProductId = (item) => {
+    const product = item?.product || item
+    return product?._id || product?.id || null
+  }
+
   const addToCart = useCallback(async (product) => {
+    if (!product?.inStock) return
+    const productId = product._id || product.id
     try {
-      const cartData = await addToCartAPI(sessionId, product._id || product.id)
+      const cartData = await addToCartAPI(sessionId, productId)
       setCart(cartData.items || [])
     } catch (error) {
       console.error('Error adding to cart:', error)
-      // Fallback to local state if API fails
       setCart((prevCart) => {
-        const existingItem = prevCart.find((item) => 
-          (item.product?._id || item.product?.id || item.id) === (product._id || product.id)
-        )
-        if (existingItem) {
+        const existing = prevCart.find((item) => getItemProductId(item) === productId)
+        if (existing) {
           return prevCart.map((item) =>
-            (item.product?._id || item.product?.id || item.id) === (product._id || product.id)
-              ? { ...item, quantity: item.quantity + 1 }
+            getItemProductId(item) === productId
+              ? { ...item, quantity: (item.quantity || 1) + 1 }
               : item
           )
         }
-        return [...prevCart, { product, quantity: 1 }]
+        return [
+          ...prevCart,
+          {
+            _id: `local-${productId}-${Date.now()}`,
+            id: `local-${productId}-${Date.now()}`,
+            product,
+            quantity: 1
+          }
+        ]
       })
     }
   }, [sessionId])
@@ -57,24 +86,7 @@ function App() {
       setCart(cartData.items || [])
     } catch (error) {
       console.error('Error removing from cart:', error)
-      // Fallback to local state - clean itemId for comparison
-      let cleanItemId = itemId
-      if (itemId && typeof itemId === 'object') {
-        cleanItemId = itemId.toString()
-      }
-      if (cleanItemId && typeof cleanItemId === 'string') {
-        cleanItemId = cleanItemId.split(':')[0]
-      }
-      setCart((prevCart) => prevCart.filter((item) => {
-        let itemIdToCompare = item._id || item.id
-        if (itemIdToCompare && typeof itemIdToCompare === 'object') {
-          itemIdToCompare = itemIdToCompare.toString()
-        }
-        if (itemIdToCompare && typeof itemIdToCompare === 'string') {
-          itemIdToCompare = itemIdToCompare.split(':')[0]
-        }
-        return itemIdToCompare !== cleanItemId
-      }))
+      setCart((prevCart) => prevCart.filter((item) => getItemId(item) !== itemId))
     }
   }, [sessionId])
 
@@ -88,30 +100,14 @@ function App() {
       setCart(cartData.items || [])
     } catch (error) {
       console.error('Error updating quantity:', error)
-      // Fallback to local state - clean itemId for comparison
-      let cleanItemId = itemId
-      if (itemId && typeof itemId === 'object') {
-        cleanItemId = itemId.toString()
-      }
-      if (cleanItemId && typeof cleanItemId === 'string') {
-        cleanItemId = cleanItemId.split(':')[0]
-      }
       setCart((prevCart) =>
-        prevCart.map((item) => {
-          let itemIdToCompare = item._id || item.id
-          if (itemIdToCompare && typeof itemIdToCompare === 'object') {
-            itemIdToCompare = itemIdToCompare.toString()
-          }
-          if (itemIdToCompare && typeof itemIdToCompare === 'string') {
-            itemIdToCompare = itemIdToCompare.split(':')[0]
-          }
-          return itemIdToCompare === cleanItemId ? { ...item, quantity } : item
-        })
+        prevCart.map((item) => (getItemId(item) === itemId ? { ...item, quantity } : item))
       )
     }
-  }, [sessionId])
+  }, [sessionId, removeFromCart])
 
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
+  const [successOrder, setSuccessOrder] = useState(null)
 
   const getTotalItems = useMemo(() => {
     return cart.reduce((total, item) => total + (item.quantity || 0), 0)
@@ -131,14 +127,51 @@ function App() {
   }
 
   const handleOrderSuccess = (order) => {
-    alert(`Order placed successfully!\n\nOrder Number: ${order.orderNumber}\n\nYou will receive a confirmation email shortly. We will contact you soon for delivery details.\n\nFor any queries, contact us at:\nEmail: info.aromatales@gmail.com\nWhatsApp: +92 333 1290243`)
     setCart([])
     setIsCheckoutOpen(false)
+    setSuccessOrder(order)
+  }
+
+  const checkoutModalProps = {
+    isOpen: isCheckoutOpen,
+    onClose: () => setIsCheckoutOpen(false),
+    cart,
+    total: getCartTotal,
+    onOrderSuccess: handleOrderSuccess
   }
 
   return (
     <div className="app">
+      <HashScroller />
       <Routes>
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/sign-up" element={<SignUp />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requireAdmin>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="products" replace />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="products/new" element={<AdminProductForm />} />
+          <Route path="products/:id/edit" element={<AdminProductForm />} />
+        </Route>
+        <Route
+          path="/account"
+          element={
+            <AccountPage
+              cartCount={getTotalItems}
+              cart={cart}
+              removeFromCart={removeFromCart}
+              updateQuantity={updateQuantity}
+              onCheckout={handleCheckout}
+              {...checkoutModalProps}
+            />
+          }
+        />
         <Route
           path="/product/:id"
           element={
@@ -188,6 +221,30 @@ function App() {
           }
         />
         <Route
+          path="/shop"
+          element={
+            <>
+              <Header
+                cartCount={getTotalItems}
+                cart={cart}
+                removeFromCart={removeFromCart}
+                updateQuantity={updateQuantity}
+                onCheckout={handleCheckout}
+              />
+              <Shop addToCart={addToCart} />
+              <Footer />
+              <WhatsAppButton />
+              <CheckoutModal
+                isOpen={isCheckoutOpen}
+                onClose={() => setIsCheckoutOpen(false)}
+                cart={cart}
+                total={getCartTotal}
+                onOrderSuccess={handleOrderSuccess}
+              />
+            </>
+          }
+        />
+        <Route
           path="/"
           element={
             <>
@@ -199,8 +256,14 @@ function App() {
         onCheckout={handleCheckout}
       />
       <Banner />
-      <Products addToCart={addToCart} />
+      <FragranceDifference />
+      <CollectionShowcase />
+      <ScentHarmony />
+      <FeaturedStrip addToCart={addToCart} />
+      <PromoSplit />
+      <NewsletterBand />
       <Reviews />
+      <AboutBand />
       <Footer />
       <WhatsAppButton />
       <CheckoutModal
@@ -214,6 +277,7 @@ function App() {
           }
         />
       </Routes>
+      <OrderSuccessModal order={successOrder} onClose={() => setSuccessOrder(null)} />
     </div>
   )
 }
