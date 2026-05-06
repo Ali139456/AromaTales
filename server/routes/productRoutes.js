@@ -66,10 +66,15 @@ router.get('/', async (req, res) => {
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true });
     if (error) throw error;
-    res.json((data || []).map(formatProduct));
+    const rows = (data || []).map(formatProduct);
+    if (rows.length === 0) {
+      console.warn('Products table empty; returning local catalogue fallback');
+      return res.json(listLocalProducts());
+    }
+    res.json(rows);
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ message: error.message });
+    console.error('Error fetching products (falling back to local):', error?.message || error);
+    res.json(listLocalProducts());
   }
 });
 
@@ -88,11 +93,21 @@ router.get('/:id', async (req, res) => {
       .eq('id', req.params.id)
       .maybeSingle();
     if (error) throw error;
-    if (!data) return res.status(404).json({ message: 'Product not found' });
+    if (!data) {
+      const product = defaultProducts.find(
+        (p) => p.id === req.params.id || p._id === req.params.id
+      );
+      if (!product) return res.status(404).json({ message: 'Product not found' });
+      return res.json(formatProduct(product));
+    }
     res.json(formatProduct(data));
   } catch (error) {
-    console.error('Error fetching product:', error);
-    res.status(500).json({ message: error.message });
+    console.error('Error fetching product (local fallback):', error?.message || error);
+    const product = defaultProducts.find(
+      (p) => p.id === req.params.id || p._id === req.params.id
+    );
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    res.json(formatProduct(product));
   }
 });
 

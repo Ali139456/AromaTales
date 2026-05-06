@@ -41,15 +41,16 @@ const buildCartResponse = async (sessionId) => {
 };
 
 router.get('/:sessionId', async (req, res) => {
+  const { sessionId } = req.params;
   if (!isSupabaseEnabled()) {
-    return res.json(getMemoryCart(req.params.sessionId));
+    return res.json(getMemoryCart(sessionId));
   }
   try {
-    const cart = await buildCartResponse(req.params.sessionId);
+    const cart = await buildCartResponse(sessionId);
     res.json(cart);
   } catch (error) {
-    console.error('Error fetching cart:', error);
-    res.status(500).json({ message: error.message });
+    console.error('Error fetching cart (empty fallback):', error?.message || error);
+    res.json({ sessionId, items: [] });
   }
 });
 
